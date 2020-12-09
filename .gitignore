@@ -3,3 +3,6 @@
 ################################################################################
 
 /RtmpPusher/x64/Debug
+/RtmpPusher/Debug
+/x64/Debug
+/.vs/RtmpPusher/v16
