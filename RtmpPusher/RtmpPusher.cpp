@@ -43,7 +43,7 @@ int main()
 
 PushConfig get_push_config()
 {
-	PushConfig pushConfig = { "rtmp://livepush.fis.plus/live/ee9bb35a72e54429a2a80e3659b2e59d?txSecret=dbb0d611a0fa993cac06b76aafff9a95&txTime=5FFDC780", 1280, 720, 30 };
+	PushConfig pushConfig = { "rtmp://192.168.6.98:1935/hls/stream", 1280, 720, 30 };
 	cout << "press 1 to push 1080P 30fps, press 2 to push 720p 30fps, press 3 to push 480p 30fps:" << endl;
 	int choose = 0;
 	cin >> choose;
