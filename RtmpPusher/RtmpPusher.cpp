@@ -1,6 +1,6 @@
 // RtmpPusher.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
+#include <cstring>
 #include <iostream>
 #include "ImageCapturer.h"
 #include "Encoder.h"
@@ -66,7 +66,9 @@ VideoConfig get_video_config(PushConfig& pushConfig, std::string& deviceName)
 {
 	VideoConfig config;
 	std::string inputUrl = "video=" + deviceName;
-	config.inputUrl = inputUrl.c_str();
+	int length = inputUrl.length();
+	config.inputUrl = new char[length + 1];
+	strcpy_s(config.inputUrl, length + 1, inputUrl.c_str());
 	cout << "the input device name is :" << config.inputUrl << endl;
 	config.map["video_size"] = std::to_string(pushConfig.width) + "x" + std::to_string(pushConfig.height);
 	config.map["framerate"] = std::to_string(pushConfig.frameRate);

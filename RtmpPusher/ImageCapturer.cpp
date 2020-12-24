@@ -35,14 +35,13 @@ bool ImageCapturer::open_camera(VideoConfig& videoConfig)
 		return  false;
 	}
 
-	cout << "I can reach here 2" << endl;
 	ret = avformat_find_stream_info(m_avFormatContext, nullptr);
 	if (ret < 0)
 	{
 		av_log(NULL, AV_LOG_ERROR, "Find input file stream inform failed\n");
 		return  false;
 	}
-	cout << "I can reach here 3" << endl;
+
 	for (int i = 0; i < m_avFormatContext->nb_streams; i++)
 	{
 		if (m_avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)

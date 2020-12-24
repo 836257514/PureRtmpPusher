@@ -14,7 +14,7 @@ struct CameraData
 
 struct VideoConfig
 {
-    const char* inputUrl;
+    char* inputUrl;
     map<string, string> map;
 };
 
