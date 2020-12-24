@@ -66,9 +66,9 @@ VideoConfig get_video_config(PushConfig& pushConfig, std::string& deviceName)
 {
 	VideoConfig config;
 	std::string inputUrl = "video=" + deviceName;
-	int length = inputUrl.length();
-	config.inputUrl = new char[length + 1];
-	strcpy_s(config.inputUrl, length + 1, inputUrl.c_str());
+	unsigned int length = inputUrl.length() + 1;
+	config.inputUrl = new char[length]();
+	strcpy_s(config.inputUrl, length, inputUrl.c_str());
 	cout << "the input device name is :" << config.inputUrl << endl;
 	config.map["video_size"] = std::to_string(pushConfig.width) + "x" + std::to_string(pushConfig.height);
 	config.map["framerate"] = std::to_string(pushConfig.frameRate);

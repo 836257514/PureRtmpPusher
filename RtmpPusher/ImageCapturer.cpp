@@ -133,6 +133,7 @@ void ImageCapturer::read()
 
 			//get decoded frame.
 			ret = avcodec_receive_frame(m_codecContext, pair.srcAVFrame);
+			av_packet_unref(&packet);
 			if (ret < 0)
 			{
 				__leave;
