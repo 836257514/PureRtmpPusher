@@ -2,9 +2,10 @@
 #include <thread>
 #include <iostream>
 
-ImageCapturer::ImageCapturer(ImageCallBack imageCaptureCB)
+ImageCapturer::ImageCapturer(ImageCallBack imageCaptureCB, AVPixelFormat imageOutputFormat)
 {
 	m_imageCapturedCB = imageCaptureCB;
+	m_avPixelOutputFormat = imageOutputFormat;
 }
 
 int ImageCapturer::io_interrupt_callBack(void* objectPointer)
@@ -33,13 +34,15 @@ bool ImageCapturer::open_camera(VideoConfig& videoConfig)
 		av_log(NULL, AV_LOG_ERROR, "Input file open input failed\n");
 		return  false;
 	}
+
+	cout << "I can reach here 2" << endl;
 	ret = avformat_find_stream_info(m_avFormatContext, nullptr);
 	if (ret < 0)
 	{
 		av_log(NULL, AV_LOG_ERROR, "Find input file stream inform failed\n");
 		return  false;
 	}
-
+	cout << "I can reach here 3" << endl;
 	for (int i = 0; i < m_avFormatContext->nb_streams; i++)
 	{
 		if (m_avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
@@ -50,7 +53,7 @@ bool ImageCapturer::open_camera(VideoConfig& videoConfig)
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -86,18 +89,18 @@ bool ImageCapturer::malloc_frame(AVFramePair& pair)
 	{
 		return false;
 	}
-	pair.yuv420Frame = av_frame_alloc();
-	if (!pair.yuv420Frame)
+	pair.outputYuvFrame = av_frame_alloc();
+	if (!pair.outputYuvFrame)
 	{
 		return false;
 	}
 
-	pair.yuv420Frame->width = m_cameraData.width;
-	pair.yuv420Frame->height = m_cameraData.height;
-	pair.yuv420Frame->linesize[0] = m_cameraData.width * m_cameraData.height * 1.5;
-	pair.yuv420Frame->format = AV_PIX_FMT_YUV420P;
-	av_image_alloc(pair.yuv420Frame->data, pair.yuv420Frame->linesize, pair.yuv420Frame->width, pair.yuv420Frame->height, AV_PIX_FMT_YUV420P, 1);
-	m_swsContext = sws_getContext(m_cameraData.width, m_cameraData.height, m_cameraData.pixelFormat, m_cameraData.width, m_cameraData.height, AV_PIX_FMT_YUV420P, SWS_BILINEAR, nullptr, nullptr, nullptr);
+	pair.outputYuvFrame->width = m_cameraData.width;
+	pair.outputYuvFrame->height = m_cameraData.height;
+	pair.outputYuvFrame->linesize[0] = m_cameraData.width * m_cameraData.height * 1.5;
+	pair.outputYuvFrame->format = m_avPixelOutputFormat;
+	av_image_alloc(pair.outputYuvFrame->data, pair.outputYuvFrame->linesize, pair.outputYuvFrame->width, pair.outputYuvFrame->height, m_avPixelOutputFormat, 1);
+	m_swsContext = sws_getContext(m_cameraData.width, m_cameraData.height, m_cameraData.pixelFormat, m_cameraData.width, m_cameraData.height, m_avPixelOutputFormat, SWS_BILINEAR, nullptr, nullptr, nullptr);
 	return true;
 }
 
@@ -109,7 +112,7 @@ void ImageCapturer::read()
 		return;
 	}
 
-	pair.yuv420Frame->pts = 0;
+	pair.outputYuvFrame->pts = 0;
 	AVPacket packet;
 	__try
 	{
@@ -137,15 +140,15 @@ void ImageCapturer::read()
 			}
 
 			ret = sws_scale(m_swsContext, pair.srcAVFrame->data, pair.srcAVFrame->linesize, 0, pair.srcAVFrame->height,
-				pair.yuv420Frame->data, pair.yuv420Frame->linesize);
-			pair.yuv420Frame->pts++;
-			m_imageCapturedCB(pair.yuv420Frame);
+				pair.outputYuvFrame->data, pair.outputYuvFrame->linesize);
+			pair.outputYuvFrame->pts++;
+			m_imageCapturedCB(pair.outputYuvFrame);
 		}
 	}
 	__finally
 	{
 		av_frame_unref(pair.srcAVFrame);
-		av_frame_unref(pair.yuv420Frame);
+		av_frame_unref(pair.outputYuvFrame);
 		av_packet_unref(&packet);
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "ImageCapturer.h"
 #include <functional>
+#include "PushConfigCommon.h"
 #define  LIVESTREAM_BITRATE_720P 800000
 extern "C"
 {
@@ -13,14 +14,15 @@ typedef std::function<void(AVPacket * avPacket)> H264EncodedCallBack;
 class Encoder
 {
 public:
-	Encoder(int width, int height, int frameRate, H264EncodedCallBack callBack);
+	Encoder(PushConfig& pushConfig, H264EncodedCallBack callBack);
 	~Encoder();
 	void encode_frame(AVFrame* frame);
+	AVPixelFormat get_input_image_format();
 private:
 	H264EncodedCallBack m_h264CallBack;
 	AVCodecContext* m_avCodecContext;
 	static int get_bitrate(int width, int height, int frameRate);
-	AVCodecContext* get_qsv_context(int width, int height, int frameRate);
-	AVCodecContext* get_h264_context(int width, int height, int frameRate);
+	AVCodecContext* get_hardware_codec(int width, int height, int frameRate);
+	AVCodecContext* get_software_codec(int width, int height, int frameRate);
 };
 

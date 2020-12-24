@@ -1,10 +1,13 @@
 #include "Encoder.h"
 
-
-Encoder::Encoder(int width, int height, int frameRate, H264EncodedCallBack callBack)
+Encoder::Encoder(PushConfig& config, H264EncodedCallBack callBack)
 {
 	m_h264CallBack = callBack;
-	m_avCodecContext = get_qsv_context(width, height, frameRate);
+	m_avCodecContext = get_hardware_codec(config.width, config.height, config.frameRate);
+	if (m_avCodecContext == nullptr)
+	{
+		m_avCodecContext = get_software_codec(config.width, config.height, config.frameRate);
+	}
 }
 
 Encoder::~Encoder()
@@ -14,6 +17,11 @@ Encoder::~Encoder()
 		avcodec_free_context(&m_avCodecContext);
 		m_avCodecContext = nullptr;
 	}
+}
+
+AVPixelFormat Encoder::get_input_image_format()
+{
+	return m_avCodecContext->pix_fmt;
 }
 
 void Encoder::encode_frame(AVFrame* frame)
@@ -42,32 +50,33 @@ void Encoder::encode_frame(AVFrame* frame)
 	}
 }
 
-AVCodecContext* Encoder::get_qsv_context(int width, int height, int frameRate)
+AVCodecContext* Encoder::get_hardware_codec(int width, int height, int frameRate)
 {
 	avdevice_register_all();
-	AVCodec* codec = avcodec_find_encoder_by_name("h264_qsv");
-	if (codec == nullptr)
+	AVCodec* h264Codec = avcodec_find_encoder_by_name("h264_qsv");
+	if (h264Codec == nullptr)
 	{
 		return nullptr;
 	}
-	AVCodecContext* codecContext = avcodec_alloc_context3(codec);
+	AVCodecContext* codecContext = avcodec_alloc_context3(h264Codec);
 	if (codecContext == nullptr)
 	{
 		return nullptr;
 	}
 
+	//codecContext->codec_id = h264Codec->id;
 	codecContext->width = width; //Width
 	codecContext->height = height; //Height
 	codecContext->time_base = { 1, frameRate };  //frames per second
-	codecContext->pix_fmt = *codec->pix_fmts;
+	codecContext->pix_fmt = *(h264Codec->pix_fmts); //nv12
 	//av_opt_set(codecContext->priv_data, "profile", "main", 0);
 	codecContext->bit_rate = get_bitrate(width, height, frameRate);// put sample parameters   
-	codecContext->gop_size = frameRate * 2; //   
+	codecContext->gop_size = 12; //   
 	codecContext->max_b_frames = 1; //B frames
 
 	//av_dict_set(&options, "profile", "baseline", 0);
 
-	if (avcodec_open2(codecContext, codec, nullptr) < 0)
+	if (avcodec_open2(codecContext, h264Codec, nullptr) < 0)
 	{
 		avcodec_free_context(&codecContext);
 		return nullptr;
@@ -75,7 +84,7 @@ AVCodecContext* Encoder::get_qsv_context(int width, int height, int frameRate)
 	return codecContext;
 }
 
-AVCodecContext* Encoder::get_h264_context(int width, int height, int frameRate)
+AVCodecContext* Encoder::get_software_codec(int width, int height, int frameRate)
 {
 	AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_H264);
 	if (codec == nullptr)
@@ -110,7 +119,6 @@ AVCodecContext* Encoder::get_h264_context(int width, int height, int frameRate)
 		return nullptr;
 	}
 	return codecContext;
-
 }
 
 int Encoder::get_bitrate(int width, int height, int frameRate)

@@ -16,7 +16,7 @@ extern "C"
 using namespace std;
 
 //just shorthand to avoid long typing
-typedef std::function<void(AVFrame* frame)> ImageCallBack;
+typedef std::function<void(AVFrame * frame)> ImageCallBack;
 
 class ImageCapturer
 {
@@ -26,11 +26,12 @@ private:
 	AVFormatContext* m_avFormatContext;
 	AVCodecContext* m_codecContext;
 	SwsContext* m_swsContext;
+	AVPixelFormat m_avPixelOutputFormat;
 	bool init_camera_data(int streamIndex);
 	bool malloc_frame(AVFramePair& pair);
 	static int io_interrupt_callBack(void* objectPointer);
 public:
-	ImageCapturer(ImageCallBack imageCaptureCB);
+	ImageCapturer(ImageCallBack imageCaptureCB, AVPixelFormat imageOutputFormat);
 	~ImageCapturer();
 	bool open_camera(VideoConfig& videoConfig);
 	void read();

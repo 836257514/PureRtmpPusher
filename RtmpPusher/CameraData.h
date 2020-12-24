@@ -15,13 +15,13 @@ struct CameraData
 struct VideoConfig
 {
     const char* inputUrl;
-    //video config map;
     map<string, string> map;
 };
 
 struct AVFramePair
 {
     AVFrame* srcAVFrame;
-    AVFrame* yuv420Frame;
+    //if the codec is qsv then this should be nv12 frame type, other it's yuvi420
+    AVFrame* outputYuvFrame;
 };
 

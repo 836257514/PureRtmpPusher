@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "PushConfigCommon.h"
 extern "C"
 {
 #include "libavcodec\codec_id.h"
@@ -8,14 +9,6 @@ extern "C"
 }
 
 using namespace std;
-
-struct PushConfig
-{
-	string url;
-	int width;
-	int height;
-	int frameRate;
-};
 
 class Pusher
 {
