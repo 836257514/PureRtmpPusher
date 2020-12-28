@@ -15,11 +15,15 @@ class StreamReceiver
 private:
 	AVFormatContext* m_avFormatContext;
 	AVCodecContext* m_avCodecContext;
+	const char* m_streamUrl;
+	int m_timeOut;
 	AVPixelFormat m_targetPixelFormat;
 	SwsContext* m_swsContext;
 	int m_videoIndex;
 public:
-	StatusCode init(const char* streamUrl, int timeOut, AVPixelFormat& targetPixelFormat);
+	StreamReceiver(const char* streamUrl, int timeOut, ConvertPixelFormat& targetPixelFormat);
+	~StreamReceiver();
+	StatusCode init();
 	void receive();
 };
 

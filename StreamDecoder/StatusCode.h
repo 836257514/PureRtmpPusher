@@ -1,13 +1,22 @@
 #pragma once
-
-enum class StatusCode
+extern "C"
 {
-	Success,
-	OpenInputFail,
-	FindStreamInfoFail,
-	CanNotFindVideoStream,
-	CanNotFindDecoder,
-	CodecParameterToContextFail,
-	DecoderToContextFail
-};
+	enum class StatusCode
+	{
+		Success,
+		OpenInputFail,
+		FindStreamInfoFail,
+		CanNotFindVideoStream,
+		CanNotFindDecoder,
+		CodecParameterToContextFail,
+		DecoderToContextFail
+	};
+
+	enum class ConvertPixelFormat
+	{
+		YuvI420P,
+		BGR24,
+		BGRA
+	};
+}
 

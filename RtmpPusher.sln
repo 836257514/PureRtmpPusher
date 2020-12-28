@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RtmpPusher", "RtmpPusher\Rt
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamDecoder", "StreamDecoder\StreamDecoder.vcxproj", "{036DCFF8-6B0D-4571-95F9-F50E47735AB0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DecodeTest", "DecodeTest\DecodeTest.vcxproj", "{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -27,6 +29,12 @@ Global
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Release|x64.ActiveCfg = Release|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Release|x64.Build.0 = Release|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Release|x86.ActiveCfg = Release|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Debug|x64.ActiveCfg = Debug|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Debug|x64.Build.0 = Debug|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Debug|x86.ActiveCfg = Debug|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x64.ActiveCfg = Release|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x64.Build.0 = Release|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
