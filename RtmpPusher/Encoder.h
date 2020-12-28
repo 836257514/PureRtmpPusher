@@ -5,8 +5,8 @@
 #define  LIVESTREAM_BITRATE_720P 800000
 extern "C"
 {
-#include "libavformat\avformat.h"
-#include "libavutil\opt.h"
+#include <libavformat\avformat.h>
+#include <libavutil\opt.h>
 }
 
 typedef std::function<void(AVPacket * avPacket)> H264EncodedCallBack;

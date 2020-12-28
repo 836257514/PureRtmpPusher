@@ -6,3 +6,6 @@
 /RtmpPusher/Debug
 /x64/Debug
 /.vs/RtmpPusher/v16
+/x64/Release
+/RtmpPusher/x64/Release
+/StreamDecoder/x64/Release
