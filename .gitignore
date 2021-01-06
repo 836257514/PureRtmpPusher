@@ -10,3 +10,5 @@
 /RtmpPusher/x64/Release
 /StreamDecoder/x64/Release
 /DecodeTest/x64/Release
+/DecodeTest/x64/Debug
+/StreamDecoder/x64/Debug

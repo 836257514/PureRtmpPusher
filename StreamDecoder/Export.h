@@ -5,7 +5,7 @@
 
 extern "C"
 {
-	_declspec(dllexport) void* __stdcall sd_create_instance(const char* streamUrl, int timeOut, ConvertPixelFormat targetPixelFormat);
+	_declspec(dllexport) void* __stdcall sd_create_instance(const char* streamUrl, int timeOut, ConvertPixelFormat targetPixelFormat, FrameReceived frameReceived);
 
 	_declspec(dllexport) StatusCode __stdcall sd_init_instance(void* instance);
 

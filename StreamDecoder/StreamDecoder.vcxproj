@@ -95,6 +95,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="StatusCode.h" />
     <ClInclude Include="StreamReceiver.h" />
+    <ClInclude Include="VideoFrame.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -104,6 +105,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StreamReceiver.cpp" />
+    <ClCompile Include="VideoFrame.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

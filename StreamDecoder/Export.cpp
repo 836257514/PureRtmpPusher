@@ -2,9 +2,9 @@
 #include "Export.h"
 
 
-void* __stdcall sd_create_instance(const char* streamUrl, int timeOut, ConvertPixelFormat targetPixelFormat)
+void* __stdcall sd_create_instance(const char* streamUrl, int timeOut, ConvertPixelFormat targetPixelFormat, FrameReceived frameReceived)
 {
-	return new StreamReceiver(streamUrl, timeOut, targetPixelFormat);
+	return new StreamReceiver(streamUrl, timeOut, targetPixelFormat, frameReceived);
 }
 
 StatusCode __stdcall sd_init_instance(void* instance)

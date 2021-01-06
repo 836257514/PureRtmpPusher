@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "StreamReceiver.h"
 
-StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, ConvertPixelFormat& targetPixelFormat)
+
+StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, ConvertPixelFormat& targetPixelFormat, FrameReceived frameReceived)
 {
 	m_streamUrl = streamUrl;
 	m_timeOut = timeOut;
@@ -17,6 +18,7 @@ StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, ConvertPixelF
 			m_targetPixelFormat = AV_PIX_FMT_BGRA;
 			break;
 	}
+	m_frameReceivedCB = frameReceived;
 }
 
 StreamReceiver::~StreamReceiver()
@@ -42,8 +44,9 @@ StreamReceiver::~StreamReceiver()
 
 StatusCode StreamReceiver::init()
 {
+	avdevice_register_all();
 	avformat_network_init();
-	AVDictionary* pOptions;
+	AVDictionary* pOptions = nullptr;
 	const char* cTimeOut = std::to_string(m_timeOut).c_str();
 	av_dict_set(&pOptions, "stimeout", cTimeOut, 0);
 	int ret = avformat_open_input(&m_avFormatContext, m_streamUrl, NULL, &pOptions);
@@ -110,8 +113,12 @@ void StreamReceiver::receive()
 {
 	AVFrame* srcFrame = av_frame_alloc();
 	AVFrame* targetFrame = av_frame_alloc();
+	targetFrame->format = m_targetPixelFormat;
+	targetFrame->width = m_avCodecContext->width;
+	targetFrame->height = m_avCodecContext->height;
 	av_image_alloc(targetFrame->data, targetFrame->linesize, m_avCodecContext->width, m_avCodecContext->height, m_targetPixelFormat, 1);
 	AVPacket* pAvPacket = (AVPacket*)av_malloc(sizeof(AVPacket));
+	int index = 0;
 	while (av_read_frame(m_avFormatContext, pAvPacket) == 0)
 	{
 		//only care about video frame.
@@ -124,12 +131,20 @@ void StreamReceiver::receive()
 			}
 
 			ret = avcodec_receive_frame(m_avCodecContext, srcFrame);
+			if (ret == -11)
+			{
+				continue;
+			}
+
 			if (ret != 0)
 			{
 				break;
 			}
 
 			sws_scale(m_swsContext, (const uint8_t* const*)srcFrame->data, srcFrame->linesize, 0, m_avCodecContext->height, targetFrame->data, targetFrame->linesize);
+			VideoFrame frame(targetFrame, index);
+			m_frameReceivedCB(frame);
+			index++;
 		}
 		av_packet_unref(pAvPacket);
 	}
