@@ -90,6 +90,8 @@
   <ItemGroup>
     <ClCompile Include="Encoder.cpp" />
     <ClCompile Include="ImageCapturer.cpp" />
+    <ClCompile Include="LogEngine.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Pusher.cpp" />
     <ClCompile Include="RtmpPusher.cpp" />
   </ItemGroup>
@@ -99,6 +101,8 @@
     <ClInclude Include="Encoder.h" />
     <ClInclude Include="ImageCapturer.h" />
     <ClInclude Include="ImgUtility.h" />
+    <ClInclude Include="LogEngine.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="PushConfigCommon.h" />
     <ClInclude Include="Pusher.h" />
   </ItemGroup>

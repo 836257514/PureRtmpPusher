@@ -11,27 +11,35 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DecodeTest", "DecodeTest\De
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Debug|x64.ActiveCfg = Debug|x64
 		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Debug|x64.Build.0 = Debug|x64
 		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Debug|x86.ActiveCfg = Debug|x64
-		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Release|x64.ActiveCfg = Debug|x64
-		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Release|x64.Build.0 = Debug|x64
+		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Release|Any CPU.ActiveCfg = Release|x64
+		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Release|x64.ActiveCfg = Release|x64
+		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Release|x64.Build.0 = Release|x64
 		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6}.Release|x86.ActiveCfg = Release|x64
+		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Debug|x64.ActiveCfg = Debug|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Debug|x64.Build.0 = Debug|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Debug|x86.ActiveCfg = Debug|x64
+		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Release|Any CPU.ActiveCfg = Release|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Release|x64.ActiveCfg = Release|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Release|x64.Build.0 = Release|x64
 		{036DCFF8-6B0D-4571-95F9-F50E47735AB0}.Release|x86.ActiveCfg = Release|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Debug|x64.ActiveCfg = Debug|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Debug|x64.Build.0 = Debug|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Debug|x86.ActiveCfg = Debug|x64
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|Any CPU.ActiveCfg = Release|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x64.ActiveCfg = Release|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x64.Build.0 = Release|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x86.ActiveCfg = Release|x64

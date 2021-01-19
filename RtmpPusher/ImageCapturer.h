@@ -13,6 +13,7 @@ extern "C"
 #include <string>
 #include "CameraData.h"
 #include "ImgUtility.h"
+#include "Logger.h"
 using namespace std;
 
 //just shorthand to avoid long typing
@@ -29,6 +30,7 @@ private:
 	AVPixelFormat m_avPixelOutputFormat;
 	bool init_camera_data(int streamIndex);
 	bool malloc_frame(AVFramePair& pair);
+	static int m_timeout;
 	static int io_interrupt_callBack(void* objectPointer);
 public:
 	ImageCapturer(ImageCallBack imageCaptureCB, AVPixelFormat imageOutputFormat);

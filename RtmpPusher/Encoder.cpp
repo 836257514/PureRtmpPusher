@@ -2,6 +2,11 @@
 
 Encoder::Encoder(PushConfig& config, H264EncodedCallBack callBack)
 {
+	m_avPacket = ImgUtility::create_packet();
+	if (m_avPacket == NULL)
+	{
+		Logger::write("create packet fail when encode");
+	}
 	m_h264CallBack = callBack;
 	m_avCodecContext = get_hardware_codec(config.width, config.height, config.frameRate);
 	if (m_avCodecContext == nullptr)
@@ -29,23 +34,12 @@ void Encoder::encode_frame(AVFrame* frame)
 	// send frame to encode queue;
 	if (avcodec_send_frame(m_avCodecContext, frame) == 0)
 	{
-		int eof = AVERROR(AVERROR_EOF);
-		while (true)
+		//receive packet from encode queue.
+		int ret = avcodec_receive_packet(m_avCodecContext, m_avPacket);
+		if (ret == 0)
 		{
-			AVPacket* avPacket = ImgUtility::create_packet();
-			//receive packet from encode queue.
-			int ret = avcodec_receive_packet(m_avCodecContext, avPacket);
-			if (ret == eof || ret < 0)
-			{
-				//编码器可能会接收多个输入帧/数据包而不返回帧，直到其内部缓冲区被填充为止。
-				av_packet_unref(avPacket);
-				break;
-			}
-			else
-			{
-				m_h264CallBack(avPacket);
-				av_packet_unref(avPacket);
-			}
+			m_h264CallBack(m_avPacket);
+			av_packet_unref(m_avPacket);
 		}
 	}
 }

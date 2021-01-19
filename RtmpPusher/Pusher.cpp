@@ -83,32 +83,7 @@ void Pusher::set_config(PushConfig pushConfig)
 
 void Pusher::push(AVPacket* avPacket)
 {
-	////Delay if too fast, too fast may cause the server crash.
-	AVRational time_base = m_codecContext->time_base;
-	AVRational time_base_q = { 1, AV_TIME_BASE };
-	int64_t pts_time = av_rescale_q(avPacket->dts, time_base, time_base_q);
-	int64_t now_time = av_gettime() - m_startTime;
-	//if (pts_time > now_time)
-	//{
-	//	av_usleep(static_cast<unsigned int>(pts_time - now_time));
-	//}
-
-	//Re calc the pts dts and duration.
-	AVStream* outStream = m_formatContext->streams[0];
-	avPacket->pts = av_rescale_q_rnd(avPacket->pts, m_codecContext->time_base, outStream->time_base, static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-	avPacket->dts = av_rescale_q_rnd(avPacket->dts, m_codecContext->time_base, outStream->time_base, static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-	avPacket->duration = av_rescale_q(avPacket->duration, m_codecContext->time_base, outStream->time_base);
-
-	AVPacket* clonedAvPacket = ImgUtility::create_packet();
-	av_init_packet(clonedAvPacket);
-	clonedAvPacket->data = nullptr;
-	clonedAvPacket->size = 0;
-	av_packet_copy_props(clonedAvPacket, avPacket);
-	av_packet_ref(clonedAvPacket, avPacket);
-	//Write the frame, notice that here must use av_interleaved_write_frame, it will automatic control the interval.
-	//Notice2, after call av_interleaved_write_frame, the packet's data will be released.
-	//int tickcount = GetTickCount();
-	int ret = av_write_frame(m_formatContext, clonedAvPacket);
-	av_packet_unref(clonedAvPacket);
+	av_packet_rescale_ts(avPacket, m_codecContext->time_base, m_formatContext->streams[0]->time_base);
+	int ret = av_write_frame(m_formatContext, avPacket);
 }
 

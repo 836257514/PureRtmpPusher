@@ -49,9 +49,11 @@ public:
 	static AVPacket* create_packet()
 	{
 		AVPacket* avPacket = av_packet_alloc();
-		av_init_packet(avPacket);
-		avPacket->data = nullptr;
-		avPacket->size = 0;
+		if (avPacket)
+		{
+			av_init_packet(avPacket);
+		}
+		
 		return avPacket;
 	}
 

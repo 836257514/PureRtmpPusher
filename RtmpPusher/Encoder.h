@@ -19,6 +19,7 @@ public:
 	void encode_frame(AVFrame* frame);
 	AVPixelFormat get_input_image_format();
 private:
+	AVPacket* m_avPacket;
 	H264EncodedCallBack m_h264CallBack;
 	AVCodecContext* m_avCodecContext;
 	static int get_bitrate(int width, int height, int frameRate);

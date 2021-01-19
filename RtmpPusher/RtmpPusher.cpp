@@ -7,12 +7,21 @@
 #include <thread>
 #include "Pusher.h"
 #include "PushConfigCommon.h"
+#include "Logger.h"
 
+extern "C"
+{
+#include "libavutil/log.h"
+}
+
+void log_output(void* ptr, int level, const char* fmt, va_list vl);
 PushConfig get_push_config();
 VideoConfig get_video_config(PushConfig& pushConfig, std::string& deviceName);
 
 int main()
 {
+	Logger::init("C:\\RTMPLog");
+	av_log_set_callback(log_output); 
 	cout << "input device name:" << endl;
 	std::string deviceName;
 	getline(cin, deviceName);
@@ -32,13 +41,15 @@ int main()
 	bool readyToUse = capture->open_camera(videoConfig);
 	if (readyToUse)
 	{
-		std::thread t(&ImageCapturer::read, capture);
-		t.join();
+		std::thread t1(&ImageCapturer::read, capture);
+		t1.join();
 	}
 
 	delete pusher;
 	delete encoder;
 	delete capture;
+	Logger::write("APP is paused.");
+	system("pause");
 }
 
 PushConfig get_push_config()
@@ -76,3 +87,13 @@ VideoConfig get_video_config(PushConfig& pushConfig, std::string& deviceName)
 	return config;
 }
 
+void log_output(void* ptr, int level, const char* fmt, va_list vl) 
+{
+	char content[500];
+	//只抓比warning 严重的log
+	if (fmt && level <= AV_LOG_WARNING)
+	{
+		vsnprintf(content, sizeof(content), fmt, vl);
+		Logger::write(content);
+	}
+}
