@@ -19,7 +19,7 @@ class StreamReceiver
 private:
 	AVFormatContext* m_avFormatContext;
 	AVCodecContext* m_avCodecContext;
-	const char* m_streamUrl;
+	char* m_streamUrl;
 	int m_timeOut; //micro second
 	AVPixelFormat m_targetPixelFormat;
 	SwsContext* m_swsContext;

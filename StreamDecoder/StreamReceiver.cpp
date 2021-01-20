@@ -1,22 +1,26 @@
 #include "pch.h"
 #include "StreamReceiver.h"
+#include <windows.h>
 
+using namespace std;
 
 StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, ConvertPixelFormat& targetPixelFormat, FrameReceived frameReceived)
 {
-	m_streamUrl = streamUrl;
+	int length = strlen(streamUrl) + 1;
+	m_streamUrl = new char[length];
+	strcpy_s(m_streamUrl, length, streamUrl);
 	m_timeOut = timeOut;
 	switch (targetPixelFormat)
 	{
-		case ConvertPixelFormat::YuvI420P:
-			m_targetPixelFormat = AV_PIX_FMT_YUV420P;
-			break;
-		case ConvertPixelFormat::BGR24:
-			m_targetPixelFormat = AV_PIX_FMT_BGR24;
-			break;
-		case ConvertPixelFormat::BGRA:
-			m_targetPixelFormat = AV_PIX_FMT_BGRA;
-			break;
+	case ConvertPixelFormat::YuvI420P:
+		m_targetPixelFormat = AV_PIX_FMT_YUV420P;
+		break;
+	case ConvertPixelFormat::BGR24:
+		m_targetPixelFormat = AV_PIX_FMT_BGR24;
+		break;
+	case ConvertPixelFormat::BGRA:
+		m_targetPixelFormat = AV_PIX_FMT_BGRA;
+		break;
 	}
 	m_frameReceivedCB = frameReceived;
 }
@@ -116,39 +120,53 @@ void StreamReceiver::receive()
 	targetFrame->format = m_targetPixelFormat;
 	targetFrame->width = m_avCodecContext->width;
 	targetFrame->height = m_avCodecContext->height;
+	cout << targetFrame->data << endl;
 	av_image_alloc(targetFrame->data, targetFrame->linesize, m_avCodecContext->width, m_avCodecContext->height, m_targetPixelFormat, 1);
 	AVPacket* pAvPacket = (AVPacket*)av_malloc(sizeof(AVPacket));
-	int index = 0;
-	while (av_read_frame(m_avFormatContext, pAvPacket) == 0)
+	VideoFrame frame(targetFrame, 0);
+
+	while (true)
 	{
-		//only care about video frame.
-		if (pAvPacket->stream_index == m_videoIndex)
+#ifdef _DEBUG
+		clock_t start = clock();
+#endif
+		int ret = av_read_frame(m_avFormatContext, pAvPacket);
+		if (ret == 0)
 		{
-			int ret = avcodec_send_packet(m_avCodecContext, pAvPacket);
-			if (ret != 0)
+			//only care about video frame.
+			if (pAvPacket->stream_index == m_videoIndex)
 			{
-				break;
-			}
+				int ret = avcodec_send_packet(m_avCodecContext, pAvPacket);
+				av_packet_unref(pAvPacket);
+				if (ret != 0)
+				{
+					break;
+				}
 
-			ret = avcodec_receive_frame(m_avCodecContext, srcFrame);
-			if (ret == -11)
-			{
-				continue;
-			}
+				ret = avcodec_receive_frame(m_avCodecContext, srcFrame);
+				if (ret == -11)
+				{
+					continue;
+				}
 
-			if (ret != 0)
-			{
-				break;
-			}
+				if (ret != 0)
+				{
+					break;
+				}
 
-			sws_scale(m_swsContext, (const uint8_t* const*)srcFrame->data, srcFrame->linesize, 0, m_avCodecContext->height, targetFrame->data, targetFrame->linesize);
-			VideoFrame frame(targetFrame, index);
-			m_frameReceivedCB(frame);
-			index++;
+				sws_scale(m_swsContext, (const uint8_t* const*)srcFrame->data, srcFrame->linesize, 0, m_avCodecContext->height, targetFrame->data, targetFrame->linesize);
+				m_frameReceivedCB(frame);
+				frame.m_index++;
+			}
 		}
-		av_packet_unref(pAvPacket);
+		Sleep(2);
+#ifdef _DEBUG
+		clock_t end = clock();
+		cout << end - start << endl;
+#endif
 	}
 
+	av_packet_unref(pAvPacket);
 	av_frame_unref(srcFrame);
 	av_frame_unref(targetFrame);
 }
