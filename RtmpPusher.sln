@@ -11,6 +11,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DecodeTest", "DecodeTest\De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direct3DViewer", "Direct3DViewer\Direct3DViewer.csproj", "{C656C7DA-911B-4050-B09B-66B051A25A03}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pusher", "Pusher", "{F885381D-8D64-47CF-B4BE-12213C8FD375}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Player", "Player", "{E52B51B5-FAD8-417B-AC13-E804A37978AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +64,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7EFACAD2-F71E-4D4D-A799-CF99F9A704E6} = {F885381D-8D64-47CF-B4BE-12213C8FD375}
+		{036DCFF8-6B0D-4571-95F9-F50E47735AB0} = {E52B51B5-FAD8-417B-AC13-E804A37978AD}
+		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5} = {E52B51B5-FAD8-417B-AC13-E804A37978AD}
+		{C656C7DA-911B-4050-B09B-66B051A25A03} = {E52B51B5-FAD8-417B-AC13-E804A37978AD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {48EA669C-BEF2-4EE6-8801-377CB4EEB7B3}
