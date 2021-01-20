@@ -12,3 +12,7 @@
 /DecodeTest/x64/Release
 /DecodeTest/x64/Debug
 /StreamDecoder/x64/Debug
+/D3DImageDemo/obj/Debug
+/D3DImageDemo/bin/Debug
+/Direct3DViewer/bin/Debug
+/Direct3DViewer/obj/Debug

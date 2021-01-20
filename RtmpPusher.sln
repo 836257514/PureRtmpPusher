@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamDecoder", "StreamDeco
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DecodeTest", "DecodeTest\DecodeTest.vcxproj", "{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Direct3DViewer", "Direct3DViewer\Direct3DViewer.csproj", "{C656C7DA-911B-4050-B09B-66B051A25A03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,18 @@ Global
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x64.ActiveCfg = Release|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x64.Build.0 = Release|x64
 		{84F11E55-01D2-4A8D-9F54-6D3DD972FFF5}.Release|x86.ActiveCfg = Release|x64
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Debug|x64.Build.0 = Debug|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Debug|x86.Build.0 = Debug|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Release|x64.ActiveCfg = Release|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Release|x64.Build.0 = Release|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Release|x86.ActiveCfg = Release|Any CPU
+		{C656C7DA-911B-4050-B09B-66B051A25A03}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
