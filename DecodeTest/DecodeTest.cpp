@@ -9,7 +9,7 @@ void frame_received(VideoFrame&);
 
 int main()
 {
-    void* instance = sd_create_instance("rtmp://192.168.6.98:1935/hls/stream", 3000000, ConvertPixelFormat::YuvI420P, frame_received);
+    void* instance = sd_create_instance("rtmp://192.168.6.98:1935/hls/stream", 3000000, InputPixelFormat::YuvI420P, frame_received);
     StatusCode statusCode = sd_init_instance(instance);
     if (statusCode == StatusCode::Success)
     {

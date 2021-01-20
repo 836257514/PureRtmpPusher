@@ -2,13 +2,14 @@
 #include "VideoFrame.h"
 
 
-VideoFrame::VideoFrame(AVFrame* frame, int index)
+VideoFrame::VideoFrame(int width, int height, AVPixelFormat format, int index)
 {
-	m_width = frame->width;
-	m_height = frame->height;
-	switch (frame->format)
+	m_width = width;
+	m_height = height;
+	switch (format)
 	{
 	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_NV12:
 		m_length = m_width * m_height * 1.5;
 		break;
 	case AV_PIX_FMT_BGR24:
@@ -19,8 +20,15 @@ VideoFrame::VideoFrame(AVFrame* frame, int index)
 		break;
 	}
 	m_index = index;
+}
+
+void VideoFrame::set_data(uint8_t* data[AV_NUM_DATA_POINTERS])
+{
 	for (int i = 0; i < AV_NUM_DATA_POINTERS; ++i)
 	{
-		m_data[i] = frame->data[i];
+		if (m_data[i] != data[i])
+		{
+			m_data[i] = data[i];
+		}
 	}
 }

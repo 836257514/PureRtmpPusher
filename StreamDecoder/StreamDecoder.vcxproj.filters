@@ -33,6 +33,9 @@
     <ClInclude Include="VideoFrame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImageFormatConverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VideoFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageFormatConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

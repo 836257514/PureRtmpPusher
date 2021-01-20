@@ -17,7 +17,7 @@ namespace Direct3DViewer
         private FrameReceived _received;
 
         [DllImport("StreamDecoder.dll", EntryPoint = "sd_create_instance")]
-        private static extern IntPtr CreateInstance(string streamUrl, int timeOut, ConvertPixelFormat targetPixelFormat, FrameReceived frame);
+        private static extern IntPtr CreateInstance(string streamUrl, int timeOut, InputPixelFormat targetPixelFormat, FrameReceived frame);
 
         [DllImport("StreamDecoder.dll", EntryPoint = "sd_init_instance")]
         private static extern StatusCode InitInstance(IntPtr instance);
@@ -35,7 +35,7 @@ namespace Direct3DViewer
         {
             _received = FrameDecodedCallback;
             imgHoster.Source = _imageSource.ImageSource;
-            IntPtr instance = CreateInstance("rtmp://192.168.6.98:1935/hls/stream", 3000000, ConvertPixelFormat.YuvI420P, _received);
+            IntPtr instance = CreateInstance("rtmp://192.168.6.98:1935/hls/stream", 3000000, InputPixelFormat.YuvI420P, _received);
             Task.Run(() =>
             {
                 StatusCode statusCode = InitInstance(instance);

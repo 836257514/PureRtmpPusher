@@ -19,6 +19,7 @@ class StreamReceiver
 private:
 	AVFormatContext* m_avFormatContext;
 	AVCodecContext* m_avCodecContext;
+	AVPixelFormat m_srcPixelFormat;
 	char* m_streamUrl;
 	int m_timeOut; //micro second
 	AVPixelFormat m_targetPixelFormat;
@@ -26,7 +27,7 @@ private:
 	int m_videoIndex;
 	FrameReceived m_frameReceivedCB;
 public:
-	StreamReceiver(const char* streamUrl, int timeOut, ConvertPixelFormat& targetPixelFormat, FrameReceived frameReceived);
+	StreamReceiver(const char* streamUrl, int timeOut, InputPixelFormat& targetPixelFormat, FrameReceived frameReceived);
 	~StreamReceiver();
 	StatusCode init();
 	void receive();

@@ -61,9 +61,10 @@ namespace Direct3DViewer
 		DecoderToContextFail
 	};
 
-	public enum ConvertPixelFormat
+	public enum InputPixelFormat
 	{
 		YuvI420P,
+		NV12,
 		BGR24,
 		BGRA
 	};

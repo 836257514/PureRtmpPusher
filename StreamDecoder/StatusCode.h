@@ -12,11 +12,12 @@ extern "C"
 		DecoderToContextFail
 	};
 
-	enum class ConvertPixelFormat
+	enum class InputPixelFormat
 	{
 		YuvI420P,
+		NV12,
 		BGR24,
-		BGRA
+		BGRA,
 	};
 }
 

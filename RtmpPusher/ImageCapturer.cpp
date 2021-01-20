@@ -108,6 +108,8 @@ bool ImageCapturer::malloc_frame(AVFramePair& pair)
 	pair.outputYuvFrame->width = m_cameraData.width;
 	pair.outputYuvFrame->height = m_cameraData.height;
 	pair.outputYuvFrame->linesize[0] = m_cameraData.width;
+	pair.outputYuvFrame->linesize[1] = m_cameraData.width / 2;
+	pair.outputYuvFrame->linesize[2] = m_cameraData.width / 2;
 	pair.outputYuvFrame->format = m_avPixelOutputFormat;
 	av_image_alloc(pair.outputYuvFrame->data, pair.outputYuvFrame->linesize, pair.outputYuvFrame->width, pair.outputYuvFrame->height, m_avPixelOutputFormat, 1);
 	m_swsContext = sws_getContext(m_cameraData.width, m_cameraData.height, m_cameraData.pixelFormat, m_cameraData.width, m_cameraData.height, m_avPixelOutputFormat, SWS_BILINEAR, nullptr, nullptr, nullptr);

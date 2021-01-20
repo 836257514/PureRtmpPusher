@@ -1,27 +1,17 @@
 #include "pch.h"
 #include "StreamReceiver.h"
 #include <windows.h>
+#include "ImageFormatConverter.h"
 
 using namespace std;
 
-StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, ConvertPixelFormat& targetPixelFormat, FrameReceived frameReceived)
+StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, InputPixelFormat& targetPixelFormat, FrameReceived frameReceived)
 {
 	int length = strlen(streamUrl) + 1;
 	m_streamUrl = new char[length];
 	strcpy_s(m_streamUrl, length, streamUrl);
 	m_timeOut = timeOut;
-	switch (targetPixelFormat)
-	{
-	case ConvertPixelFormat::YuvI420P:
-		m_targetPixelFormat = AV_PIX_FMT_YUV420P;
-		break;
-	case ConvertPixelFormat::BGR24:
-		m_targetPixelFormat = AV_PIX_FMT_BGR24;
-		break;
-	case ConvertPixelFormat::BGRA:
-		m_targetPixelFormat = AV_PIX_FMT_BGRA;
-		break;
-	}
+	m_targetPixelFormat = ImageFormatConverter::convert_input_format(targetPixelFormat);
 	m_frameReceivedCB = frameReceived;
 }
 
@@ -44,6 +34,8 @@ StreamReceiver::~StreamReceiver()
 		sws_freeContext(m_swsContext);
 		m_swsContext = nullptr;
 	}
+
+	delete[] m_streamUrl;
 }
 
 StatusCode StreamReceiver::init()
@@ -80,6 +72,8 @@ StatusCode StreamReceiver::init()
 		return StatusCode::CanNotFindVideoStream;
 	}
 
+	m_srcPixelFormat = ImageFormatConverter::convert_deprecated_format((AVPixelFormat)pAvCodecParameter->format);
+
 	AVCodec* pCodec = avcodec_find_decoder(pAvCodecParameter->codec_id);
 	if (pCodec == NULL)
 	{
@@ -115,21 +109,22 @@ StatusCode StreamReceiver::init()
 
 void StreamReceiver::receive()
 {
-	AVFrame* srcFrame = av_frame_alloc();
-	AVFrame* targetFrame = av_frame_alloc();
-	targetFrame->format = m_targetPixelFormat;
-	targetFrame->width = m_avCodecContext->width;
-	targetFrame->height = m_avCodecContext->height;
-	cout << targetFrame->data << endl;
-	av_image_alloc(targetFrame->data, targetFrame->linesize, m_avCodecContext->width, m_avCodecContext->height, m_targetPixelFormat, 1);
+	AVFrame* pSrcFrame = av_frame_alloc();
 	AVPacket* pAvPacket = (AVPacket*)av_malloc(sizeof(AVPacket));
-	VideoFrame frame(targetFrame, 0);
+	AVFrame* pTargetFrame = NULL;
+	VideoFrame pVideoFrame(m_avCodecContext->width, m_avCodecContext->height, m_targetPixelFormat, 0);
+	if (m_srcPixelFormat != m_targetPixelFormat)
+	{
+		pTargetFrame = av_frame_alloc();
+		pTargetFrame->format = m_targetPixelFormat;
+		pTargetFrame->width = m_avCodecContext->width;
+		pTargetFrame->height = m_avCodecContext->height;
+		av_image_alloc(pTargetFrame->data, pTargetFrame->linesize, m_avCodecContext->width, m_avCodecContext->height, m_targetPixelFormat, 1);
+		pVideoFrame.set_data(pTargetFrame->data);
+	}
 
 	while (true)
 	{
-#ifdef _DEBUG
-		clock_t start = clock();
-#endif
 		int ret = av_read_frame(m_avFormatContext, pAvPacket);
 		if (ret == 0)
 		{
@@ -143,7 +138,7 @@ void StreamReceiver::receive()
 					break;
 				}
 
-				ret = avcodec_receive_frame(m_avCodecContext, srcFrame);
+				ret = avcodec_receive_frame(m_avCodecContext, pSrcFrame);
 				if (ret == -11)
 				{
 					continue;
@@ -154,19 +149,28 @@ void StreamReceiver::receive()
 					break;
 				}
 
-				sws_scale(m_swsContext, (const uint8_t* const*)srcFrame->data, srcFrame->linesize, 0, m_avCodecContext->height, targetFrame->data, targetFrame->linesize);
-				m_frameReceivedCB(frame);
-				frame.m_index++;
+				//if use target frame then the data address is same.
+				if (m_srcPixelFormat != m_targetPixelFormat)
+				{
+					sws_scale(m_swsContext, (const uint8_t* const*)pSrcFrame->data, pSrcFrame->linesize, 0, m_avCodecContext->height, pTargetFrame->data, pTargetFrame->linesize);
+				}
+				else
+				{
+					//if use src frame then the data address is different.
+					pVideoFrame.set_data(pSrcFrame->data);
+				}
+				
+				m_frameReceivedCB(pVideoFrame);
+				pVideoFrame.m_index++;
 			}
 		}
 		Sleep(2);
-#ifdef _DEBUG
-		clock_t end = clock();
-		cout << end - start << endl;
-#endif
 	}
 
 	av_packet_unref(pAvPacket);
-	av_frame_unref(srcFrame);
-	av_frame_unref(targetFrame);
+	av_frame_unref(pSrcFrame);
+	if (pTargetFrame != NULL)
+	{
+		av_frame_unref(pTargetFrame);
+	}
 }

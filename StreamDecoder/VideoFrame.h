@@ -16,6 +16,7 @@ public:
 	int m_length;
 	int m_index;
 	uint8_t* m_data[AV_NUM_DATA_POINTERS];
-	VideoFrame(AVFrame* frame, int index);
+	VideoFrame(int width, int height, AVPixelFormat format, int index);
+	void set_data(uint8_t* m_data[AV_NUM_DATA_POINTERS]);
 };
 
