@@ -6,6 +6,8 @@ using SharpDX.Direct3D9;
 using SharpDX;
 using SharpDX.Mathematics.Interop;
 using System.Windows.Forms;
+using Direct3DViewer.ImageBuffer;
+using Direct3DViewer.ImageBuffer.Filler;
 
 namespace Direct3DViewer
 {
@@ -19,13 +21,14 @@ namespace Direct3DViewer
 
         bool SetupSurface(int videoWidth, int videoHeight, FrameFormat format);
 
-        void Render(IntPtr buffer);
-
         void Render(IntPtr yBuffer, IntPtr uBuffer, IntPtr vBuffer);
     }
     public class D3DImageSource : IRenderSource
     {
+        private static Format D3DFormatYU12 = (Format)0x30323449;
+
         private static Format D3DFormatYV12 = D3DX.MakeFourCC((byte)'Y', (byte)'V', (byte)'1', (byte)'2');
+        //private static Format D3DFormatYU12 = D3DX.MakeFourCC((byte)'Y', (byte)'U', (byte)'1', (byte)'2');
         private static Format D3DFormatNV12 = D3DX.MakeFourCC((byte)'N', (byte)'V', (byte)'1', (byte)'2');
         private static RawColorBGRA BlackColor = new RawColorBGRA(0, 0, 0, 0xFF);
 
@@ -44,13 +47,7 @@ namespace Direct3DViewer
         // 视频格式信息
         private FrameFormat _frameFormat;
 
-        // 帧格式为非YV12, NV12时，uv变量无效. 此时yStride即为图像宽，yHeight即为图像高度，ySize即为图像Buffer大小
-        private int yStride;
-        private int yHeight;
-        private int uvStride;
-        private int uvHeight;
-        private int ySize;
-        private int uvSize;
+        private IImageInfo _imageBufferInfo;
 
         public ImageSource ImageSource => _d3dImage;
 
@@ -94,41 +91,24 @@ namespace Direct3DViewer
             switch (format)
             {
                 case FrameFormat.YV12:
-                    yStride = videoWidth;
-                    yHeight = videoHeight;
-                    ySize = videoWidth * videoHeight;
-                    uvStride = yStride >> 1;
-                    uvHeight = yHeight >> 1;
-                    uvSize = ySize >> 2;
+                case FrameFormat.YU12:
+                    _imageBufferInfo = new YUVI420ImageInfo(videoWidth, videoHeight);
                     break;
-
                 case FrameFormat.NV12:
-                    yStride = videoWidth;
-                    yHeight = videoHeight;
-                    ySize = videoWidth * videoHeight;
-                    uvStride = yStride;
-                    uvHeight = yHeight >> 1;
-                    uvSize = ySize >> 1;
+                    _imageBufferInfo = new NV12ImageInfo(videoWidth, videoHeight);
                     break;
-
                 case FrameFormat.YUY2:
                 case FrameFormat.UYVY:
+                    _imageBufferInfo = new YUY2ImageInfo(videoWidth, videoHeight);
+                    break;
                 case FrameFormat.RGB15: // rgb555
                 case FrameFormat.RGB16: // rgb565
-                    yStride = videoWidth << 1;
-                    yHeight = videoHeight;
-                    ySize = yStride * yHeight;
-                    uvStride = uvHeight = uvSize = 0;
+                    _imageBufferInfo = new Rgb2ChannelImageInfo(videoWidth, videoHeight);
                     break;
-
                 case FrameFormat.RGB32:
                 case FrameFormat.ARGB32:
-                    yStride = videoWidth << 2;
-                    yHeight = videoHeight;
-                    ySize = yStride * yHeight;
-                    uvStride = uvHeight = uvSize = 0;
+                    _imageBufferInfo = new Rgba4ChannelImageInfo(videoWidth, videoHeight);
                     break;
-
                 default:
                     return false;
             }
@@ -136,20 +116,6 @@ namespace Direct3DViewer
             CreateResource(d3dFormat, videoWidth, videoHeight);
             ImageSourceChanged?.Invoke(this, EventArgs.Empty);
             return true;
-        }
-
-        public void Render(IntPtr buffer)
-        {
-            FillBuffer(buffer);
-            StretchSurface();
-            if (!_d3dImage.Dispatcher.CheckAccess())
-            {
-                _d3dImage.Dispatcher.Invoke(() => InvalidateImage());
-            }
-            else
-            {
-                InvalidateImage();
-            }
         }
 
         public void Render(IntPtr yBuffer, IntPtr uBuffer, IntPtr vBuffer)
@@ -234,94 +200,6 @@ namespace Direct3DViewer
             return presentParams;
         }
 
-        private void FillBuffer(IntPtr bufferPtr)
-        {
-            if (_offScreenSurface == null)
-            {
-                return;
-            }
-
-            DataRectangle rect = _offScreenSurface.LockRectangle(LockFlags.None);
-            IntPtr surfaceBufferPtr = rect.DataPointer;
-            switch (_frameFormat)
-            {
-                case FrameFormat.YV12:
-                    if (rect.Pitch == yStride)
-                    {
-                        Interop.Memcpy(surfaceBufferPtr, bufferPtr, ySize + uvSize + uvSize);
-                    }
-                    else
-                    {
-                        IntPtr srcPtr = bufferPtr; // Y
-                        int yPitch = rect.Pitch;
-                        for (int i = 0; i < yHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, srcPtr, yStride);
-                            surfaceBufferPtr += yPitch;
-                            srcPtr += yStride;
-                        }
-
-                        int uvPitch = yPitch >> 1;
-                        for (int i = 0; i < yHeight; i++) // UV一起copy, uHeight + vHeight = yHeight
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, srcPtr, uvStride);
-                            surfaceBufferPtr += uvPitch;
-                            srcPtr += uvStride;
-                        }
-                    }
-                    break;
-
-                case FrameFormat.NV12:
-                    if (rect.Pitch == yStride)
-                    {
-                        Interop.Memcpy(surfaceBufferPtr, bufferPtr, ySize + uvSize);
-                    }
-                    else
-                    {
-                        // uv打包保存，uvWidth与yWidth相同, 因此可以合并在一个循环
-                        IntPtr srcPtr = bufferPtr;
-                        for (int i = 0; i < yHeight + uvHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, srcPtr, yStride);
-                            surfaceBufferPtr += rect.Pitch;
-                            srcPtr += yStride;
-                        }
-                    }
-                    break;
-
-                // 打包格式
-                case FrameFormat.YUY2:
-                case FrameFormat.UYVY:
-                case FrameFormat.RGB15:
-                case FrameFormat.RGB16:
-                case FrameFormat.RGB24:
-                case FrameFormat.RGB32:
-                case FrameFormat.ARGB32:
-                default:
-                    if (rect.Pitch == yStride)
-                    {
-                        Interop.Memcpy(surfaceBufferPtr, bufferPtr, ySize); // ySize此时等于整个dataSize
-                    }
-                    else
-                    {
-                        IntPtr srcPtr = bufferPtr;
-                        for (int i = 0; i < yHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, srcPtr, yStride);
-                            surfaceBufferPtr += rect.Pitch;
-                            srcPtr += yStride;
-                        }
-                    }
-
-                    break;
-            }
-
-
-
-            _offScreenSurface.UnlockRectangle();
-
-        }
-
         private void FillBuffer(IntPtr yBuffer, IntPtr uBuffer, IntPtr vBuffer)
         {
             if (_offScreenSurface == null)
@@ -330,104 +208,33 @@ namespace Direct3DViewer
             }
 
             DataRectangle rect = _offScreenSurface.LockRectangle(LockFlags.None);
-            IntPtr surfaceBufferPtr = rect.DataPointer;
             switch (_frameFormat)
             {
                 case FrameFormat.YV12:
-                    if (rect.Pitch == yStride)
-                    {
-                        Interop.Memcpy(surfaceBufferPtr, yBuffer, ySize); // Y
-                        surfaceBufferPtr += ySize;
-                        Interop.Memcpy(surfaceBufferPtr, vBuffer, uvSize); // V 
-                        surfaceBufferPtr += uvSize;
-                        Interop.Memcpy(surfaceBufferPtr, uBuffer, uvSize); // U
-                    }
-                    else
-                    {
-                        IntPtr yPtr = yBuffer; // Y
-                        int yPitch = rect.Pitch;
-                        for (int i = 0; i < yHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, yPtr, yStride);
-                            surfaceBufferPtr += yPitch;
-                            yPtr += yStride;
-                        }
-
-                        int uvPitch = yPitch >> 1;
-
-                        IntPtr vPtr = vBuffer; // V
-                        for (int i = 0; i < uvHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, vPtr, uvStride);
-                            surfaceBufferPtr += uvPitch;
-                            vPtr += uvStride;
-                        }
-
-                        IntPtr uPtr = uBuffer; // U
-                        for (int i = 0; i < uvHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, uPtr, uvStride);
-                            surfaceBufferPtr += uvPitch;
-                            uPtr += uvStride;
-                        }
-                    }
+                    YuvImageBufferFiller.FillYV12(yBuffer, uBuffer, vBuffer, rect, (YUVI420ImageInfo)_imageBufferInfo);
                     break;
-
+                case FrameFormat.YU12:
+                    YuvImageBufferFiller.FillYU12(yBuffer, uBuffer, vBuffer, rect, (YUVI420ImageInfo)_imageBufferInfo);
+                    break;
                 case FrameFormat.NV12:
-                    if (rect.Pitch == yStride)
-                    {
-                        Interop.Memcpy(surfaceBufferPtr, yBuffer, ySize); // Copy Y数据
-                        surfaceBufferPtr += ySize;
-                        Interop.Memcpy(surfaceBufferPtr, uBuffer, uvSize); // Copy UV打包数据
-                    }
-                    else
-                    {
-                        // Copy Y数据
-                        IntPtr yPtr = yBuffer;
-                        for (int i = 0; i < yHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, yPtr, yStride);
-                            surfaceBufferPtr += rect.Pitch;
-                            yPtr += yStride;
-                        }
-
-                        // Copy UV打包数据
-                        IntPtr uvPtr = uBuffer;
-                        for (int i = 0; i < uvHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, uvPtr, uvStride);
-                            surfaceBufferPtr += rect.Pitch; // 此时uv打包保存，每行数据与y相同
-                            uvPtr += uvStride;
-                        }
-                    }
+                    YuvImageBufferFiller.FillNV12(yBuffer, uBuffer, rect, (NV12ImageInfo)_imageBufferInfo);
                     break;
-
                 case FrameFormat.YUY2:
                 case FrameFormat.UYVY:
+                    YuvImageBufferFiller.FillYUY2(yBuffer, rect, (YUY2ImageInfo)_imageBufferInfo);
+                    break;
                 case FrameFormat.RGB15:
                 case FrameFormat.RGB16:
                 case FrameFormat.RGB32:
                 case FrameFormat.ARGB32:
                 default:
-                    if (rect.Pitch == yStride)
-                    {
-                        Interop.Memcpy(surfaceBufferPtr, yBuffer, ySize); // ySize此时等于整个dataSize
-                    }
-                    else
-                    {
-                        IntPtr yPtr = yBuffer;
-                        for (int i = 0; i < yHeight; i++)
-                        {
-                            Interop.Memcpy(surfaceBufferPtr, yPtr, yStride);
-                            surfaceBufferPtr += rect.Pitch;
-                            yBuffer += yStride;  // yWidth即为每行图像stride
-                        }
-                    }
+                    ChannelImageBufferFiller.FillBuffer(yBuffer, rect, (IChannelImageInfo)_imageBufferInfo);
                     break;
             }
 
             _offScreenSurface.UnlockRectangle();
         }
+
         private void StretchSurface()
         {
             //_device.ColorFill(_renderSurface, BlackColor);
@@ -499,31 +306,24 @@ namespace Direct3DViewer
             {
                 case FrameFormat.YV12:
                     return D3DFormatYV12;
-
+                case FrameFormat.YU12:
+                    return D3DFormatYU12;
                 case FrameFormat.NV12:
                     return D3DFormatNV12;
-
                 case FrameFormat.YUY2:
                     return Format.Yuy2;
-
                 case FrameFormat.UYVY:
                     return Format.Uyvy;
-
                 case FrameFormat.RGB15:
                     return Format.X1R5G5B5;
-
                 case FrameFormat.RGB16:
                     return Format.R5G6B5;
-
                 case FrameFormat.RGB32:
                     return Format.X8R8G8B8;
-
                 case FrameFormat.ARGB32:
                     return Format.A8R8G8B8;
-
                 case FrameFormat.RGB24:
                     return Format.R8G8B8;
-
                 default:
                     throw new ArgumentException("Unknown pixel format", "format");
             }

@@ -6,7 +6,7 @@
 using namespace std;
 
 StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, InputPixelFormat& targetPixelFormat, FrameReceived frameReceived)
-{
+{	
 	int length = strlen(streamUrl) + 1;
 	m_streamUrl = new char[length];
 	strcpy_s(m_streamUrl, length, streamUrl);
@@ -72,9 +72,17 @@ StatusCode StreamReceiver::init()
 		return StatusCode::CanNotFindVideoStream;
 	}
 
-	m_srcPixelFormat = ImageFormatConverter::convert_deprecated_format((AVPixelFormat)pAvCodecParameter->format);
+	AVCodec* pCodec = avcodec_find_decoder_by_name("h264_qsv");//Ó²½â	
+	if (pCodec != NULL)
+	{
+		m_srcPixelFormat = *pCodec->pix_fmts;
+	}
+	else
+	{
+		pCodec = avcodec_find_decoder(pAvCodecParameter->codec_id);//Èí½â
+		m_srcPixelFormat = ImageFormatConverter::convert_deprecated_format((AVPixelFormat)pAvCodecParameter->format);
+	}
 
-	AVCodec* pCodec = avcodec_find_decoder(pAvCodecParameter->codec_id);
 	if (pCodec == NULL)
 	{
 		return StatusCode::CanNotFindDecoder;

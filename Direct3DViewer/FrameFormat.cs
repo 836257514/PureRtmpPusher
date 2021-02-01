@@ -4,10 +4,11 @@ namespace Direct3DViewer
 {
 	public enum FrameFormat
 	{
-		YV12 = 0,
+		YV12 = 0, //I420P   yyyyvvuu
 		NV12 = 1,
 		YUY2 = 2,
 		UYVY = 3,
+		YU12 = 4, // I420P  yyyyuuvv
 
 		RGB15 = 10,
 		RGB16 = 11,
@@ -63,7 +64,7 @@ namespace Direct3DViewer
 
 	public enum InputPixelFormat
 	{
-		YuvI420P,
+		YU12,
 		NV12,
 		BGR24,
 		BGRA

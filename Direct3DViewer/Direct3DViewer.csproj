@@ -63,7 +63,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ImageBuffer\ChannelImageInfo.cs" />
+    <Compile Include="ImageBuffer\Filler\ChannelImageBufferFiller.cs" />
+    <Compile Include="ImageBuffer\YUVI420ImageInfo.cs" />
     <Compile Include="VideoFrame.cs" />
+    <Compile Include="ImageBuffer\Filler\YuvImageBufferFiller.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

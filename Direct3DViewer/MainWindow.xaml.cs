@@ -35,7 +35,7 @@ namespace Direct3DViewer
         {
             _received = FrameDecodedCallback;
             imgHoster.Source = _imageSource.ImageSource;
-            IntPtr instance = CreateInstance("rtmp://192.168.6.98:1935/hls/stream", 3000000, InputPixelFormat.YuvI420P, _received);
+            IntPtr instance = CreateInstance("rtmp://192.168.6.98:1935/hls/stream", 3000000, InputPixelFormat.NV12, _received);
             Task.Run(() =>
             {
                 StatusCode statusCode = InitInstance(instance);
@@ -51,7 +51,7 @@ namespace Direct3DViewer
         {
             if (!_imageSource.IsDeviceCreated)
             {
-                _imageSource.SetupSurface(frame.width, frame.height, FrameFormat.YV12);
+                _imageSource.SetupSurface(frame.width, frame.height, FrameFormat.NV12);
             }
 
             _imageSource.Render(frame.data[0], frame.data[1], frame.data[2]);

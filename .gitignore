@@ -17,3 +17,5 @@
 /Direct3DViewer/bin/Debug
 /Direct3DViewer/obj/Debug
 /x64
+/.vs
+/Direct3DViewer/obj/Release
