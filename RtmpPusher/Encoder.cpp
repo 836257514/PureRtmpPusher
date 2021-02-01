@@ -1,6 +1,6 @@
 #include "Encoder.h"
 
-Encoder::Encoder(PushConfig& config, H264EncodedCallBack callBack)
+Encoder::Encoder(PushConfig& config, H264EncodedCallBack callBack, bool enableHardwareEncoder)
 {
 	m_avPacket = ImgUtility::create_packet();
 	if (m_avPacket == NULL)
@@ -8,8 +8,12 @@ Encoder::Encoder(PushConfig& config, H264EncodedCallBack callBack)
 		Logger::write("create packet fail when encode");
 	}
 	m_h264CallBack = callBack;
-	m_avCodecContext = get_hardware_codec(config.width, config.height, config.frameRate);
-	if (m_avCodecContext == nullptr)
+	if (enableHardwareEncoder)
+	{
+		m_avCodecContext = get_hardware_codec(config.width, config.height, config.frameRate);
+		throw exception("Cann't find qsv encoder");
+	}
+	else
 	{
 		m_avCodecContext = get_software_codec(config.width, config.height, config.frameRate);
 	}

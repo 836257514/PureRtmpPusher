@@ -14,7 +14,7 @@ typedef std::function<void(AVPacket * avPacket)> H264EncodedCallBack;
 class Encoder
 {
 public:
-	Encoder(PushConfig& pushConfig, H264EncodedCallBack callBack);
+	Encoder(PushConfig& pushConfig, H264EncodedCallBack callBack, bool enableHardwareEncoder = false);
 	~Encoder();
 	void encode_frame(AVFrame* frame);
 	AVPixelFormat get_input_image_format();

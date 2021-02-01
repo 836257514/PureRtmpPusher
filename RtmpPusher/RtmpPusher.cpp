@@ -31,7 +31,7 @@ int main()
 	Pusher* pusher = new Pusher();
 	pusher->set_config(pushConfig);
 	auto encodedCallBack = std::bind(&Pusher::push, pusher, std::placeholders::_1);
-	Encoder* encoder = new Encoder(pushConfig, encodedCallBack);
+	Encoder* encoder = new Encoder(pushConfig, encodedCallBack, true);
 	AVPixelFormat format = encoder->get_input_image_format();
 
 	auto imageCapturedCallBack = std::bind(&Encoder::encode_frame,
