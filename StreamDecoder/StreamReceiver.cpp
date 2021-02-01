@@ -38,7 +38,7 @@ StreamReceiver::~StreamReceiver()
 	delete[] m_streamUrl;
 }
 
-StatusCode StreamReceiver::init()
+StatusCode StreamReceiver::init(bool enableHardwareDecode)
 {
 	avdevice_register_all();
 	avformat_network_init();
@@ -72,10 +72,14 @@ StatusCode StreamReceiver::init()
 		return StatusCode::CanNotFindVideoStream;
 	}
 
-	AVCodec* pCodec = avcodec_find_decoder_by_name("h264_qsv");//Ó²½â	
-	if (pCodec != NULL)
+	AVCodec* pCodec = NULL;
+	if (enableHardwareDecode)
 	{
-		m_srcPixelFormat = *pCodec->pix_fmts;
+		pCodec = avcodec_find_decoder_by_name("h264_qsv");//Ó²½â	
+		if (pCodec != NULL)
+		{
+			m_srcPixelFormat = *pCodec->pix_fmts;
+		}
 	}
 	else
 	{

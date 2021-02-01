@@ -20,7 +20,7 @@ namespace Direct3DViewer
         private static extern IntPtr CreateInstance(string streamUrl, int timeOut, InputPixelFormat targetPixelFormat, FrameReceived frame);
 
         [DllImport("StreamDecoder.dll", EntryPoint = "sd_init_instance")]
-        private static extern StatusCode InitInstance(IntPtr instance);
+        private static extern StatusCode InitInstance(IntPtr instance, bool enableHardwareDecode = false);
 
         [DllImport("StreamDecoder.dll", EntryPoint = "sd_receive")]
         private static extern void Receive(IntPtr instance);
@@ -38,7 +38,7 @@ namespace Direct3DViewer
             IntPtr instance = CreateInstance("rtmp://192.168.6.98:1935/hls/stream", 3000000, InputPixelFormat.NV12, _received);
             Task.Run(() =>
             {
-                StatusCode statusCode = InitInstance(instance);
+                StatusCode statusCode = InitInstance(instance, true);
                 if (statusCode == StatusCode.Success)
                 {
                     Receive(instance);

@@ -29,7 +29,7 @@ private:
 public:
 	StreamReceiver(const char* streamUrl, int timeOut, InputPixelFormat& targetPixelFormat, FrameReceived frameReceived);
 	~StreamReceiver();
-	StatusCode init();
+	StatusCode init(bool enableHardwareDecode = false);
 	void receive();
 };
 
