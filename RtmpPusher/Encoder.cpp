@@ -11,7 +11,10 @@ Encoder::Encoder(PushConfig& config, H264EncodedCallBack callBack, bool enableHa
 	if (enableHardwareEncoder)
 	{
 		m_avCodecContext = get_hardware_codec(config.width, config.height, config.frameRate);
-		throw exception("Cann't find qsv encoder");
+		if (m_avCodecContext == NULL)
+		{
+			throw exception("Cann't find qsv encoder");
+		}
 	}
 	else
 	{
