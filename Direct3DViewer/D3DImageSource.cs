@@ -8,21 +8,10 @@ using SharpDX.Mathematics.Interop;
 using System.Windows.Forms;
 using Direct3DViewer.ImageBuffer;
 using Direct3DViewer.ImageBuffer.Filler;
+using Direct3DViewer.Interface;
 
 namespace Direct3DViewer
 {
-    public interface IRenderSource : IDisposable
-    {
-        ImageSource ImageSource { get; }
-
-        event EventHandler ImageSourceChanged;
-
-        bool CheckFormat(FrameFormat format);
-
-        bool SetupSurface(int videoWidth, int videoHeight, FrameFormat format);
-
-        void Render(IntPtr yBuffer, IntPtr uBuffer, IntPtr vBuffer);
-    }
     public class D3DImageSource : IRenderSource
     {
         private static Format D3DFormatYU12 = (Format)0x30323449;

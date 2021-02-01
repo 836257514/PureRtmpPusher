@@ -7,6 +7,11 @@ void* __stdcall sd_create_instance(const char* streamUrl, int timeOut, InputPixe
 	return new StreamReceiver(streamUrl, timeOut, targetPixelFormat, frameReceived);
 }
 
+void __stdcall sd_destroy_instance(void* instance)
+{
+	delete (static_cast<StreamReceiver*>(instance));
+}
+
 StatusCode __stdcall sd_init_instance(void* instance, bool enableHardwareDecode)
 {
 	return static_cast<StreamReceiver*>(instance)->init(enableHardwareDecode);

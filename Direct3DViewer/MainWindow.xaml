@@ -6,7 +6,15 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="650" Width="900">
     <Grid>
-        <Image x:Name="imgHoster"/>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Image x:Name="imgHoster" Grid.Row="0"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <CheckBox IsChecked="{Binding EnableHardwareDecode}" Content="开启硬编码" VerticalAlignment="Center" Margin="5"/>
+            <Button Content="{Binding Name}" DataContext="{Binding PlayCommand}" Command="{Binding}" Height="30" Width="60" Margin="5"/>
+            <Button Content="{Binding Name}" DataContext="{Binding StopCommand}" Command="{Binding}" Height="30" Width="60" Margin="5"/>
+        </StackPanel>
     </Grid>
 </Window>
