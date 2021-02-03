@@ -5,6 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="MainWindow" Height="650" Width="900">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Content" Value="{Binding Name}"/>
+            <Setter Property="Command" Value="{Binding}"/>
+            <Setter Property="Background" Value="AliceBlue"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -13,8 +23,8 @@
         <Image x:Name="imgHoster" Grid.Row="0"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <CheckBox IsChecked="{Binding EnableHardwareDecode}" Content="开启硬编码" VerticalAlignment="Center" Margin="5"/>
-            <Button Content="{Binding Name}" DataContext="{Binding PlayCommand}" Command="{Binding}" Height="30" Width="60" Margin="5"/>
-            <Button Content="{Binding Name}" DataContext="{Binding StopCommand}" Command="{Binding}" Height="30" Width="60" Margin="5"/>
+            <Button DataContext="{Binding PlayCommand}"/>
+            <Button DataContext="{Binding StopCommand}"/>
         </StackPanel>
     </Grid>
 </Window>

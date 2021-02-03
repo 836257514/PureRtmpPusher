@@ -1,5 +1,4 @@
 ﻿using Direct3DViewer.Interface;
-using Direct3DViewer.Utility;
 using System;
 using System.Runtime.InteropServices;
 
