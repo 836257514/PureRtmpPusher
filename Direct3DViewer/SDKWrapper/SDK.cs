@@ -13,8 +13,8 @@ namespace Direct3DViewer.SDKWrapper
         [DllImport("StreamDecoder.dll", EntryPoint = "sd_init_instance")]
         public static extern StatusCode InitInstance(IntPtr instance, bool enableHardwareDecode = false);
 
-        [DllImport("StreamDecoder.dll", EntryPoint = "sd_receive")]
-        public static extern void Receive(IntPtr instance);
+        [DllImport("StreamDecoder.dll", EntryPoint = "sd_keep_receive")]
+        public static extern void KeepReceive(IntPtr instance);
 
         [DllImport("StreamDecoder.dll", EntryPoint = "sd_destroy_instance")]
         public static extern void DestroyInstance(IntPtr instance);

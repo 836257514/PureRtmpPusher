@@ -17,6 +17,11 @@ StreamReceiver::StreamReceiver(const char* streamUrl, int timeOut, InputPixelFor
 
 StreamReceiver::~StreamReceiver()
 {
+	m_stopReceive = true;
+	if (m_receiveThread.joinable())
+	{
+		m_receiveThread.join();
+	}
 	if (m_avFormatContext != nullptr)
 	{
 		avformat_free_context(m_avFormatContext);
@@ -119,6 +124,11 @@ StatusCode StreamReceiver::init(bool enableHardwareDecode)
 	return StatusCode::Success;
 }
 
+void StreamReceiver::keep_receive()
+{
+	m_receiveThread = std::thread(&StreamReceiver::receive, this);
+}
+
 void StreamReceiver::receive()
 {
 	AVFrame* pSrcFrame = av_frame_alloc();
@@ -137,6 +147,11 @@ void StreamReceiver::receive()
 
 	while (true)
 	{
+		if (m_stopReceive)
+		{
+			break;
+		}
+
 		int ret = av_read_frame(m_avFormatContext, pAvPacket);
 		if (ret == 0)
 		{

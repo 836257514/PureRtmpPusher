@@ -11,6 +11,6 @@ extern "C"
 
 	_declspec(dllexport) StatusCode __stdcall sd_init_instance(void* instance, bool enableHardwareDecode = false);
 
-	_declspec(dllexport) void __stdcall sd_receive(void* instance);
+	_declspec(dllexport) void __stdcall sd_keep_receive(void* instance);
 }
 

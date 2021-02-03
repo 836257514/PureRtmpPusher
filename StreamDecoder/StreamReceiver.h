@@ -3,6 +3,8 @@
 #include "StatusCode.h"
 #include <string>
 #include "VideoFrame.h"
+#include <thread>
+#include <windows.h>
 
 extern "C"
 {
@@ -10,6 +12,7 @@ extern "C"
 	#include <libavutil\imgutils.h>
 	#include <libswscale\swscale.h>
 	#include <libavdevice\avdevice.h>
+
 }
 
 typedef void(__stdcall *FrameReceived)(VideoFrame& videoFrame);
@@ -26,10 +29,13 @@ private:
 	SwsContext* m_swsContext;
 	int m_videoIndex;
 	FrameReceived m_frameReceivedCB;
+	bool m_stopReceive;
+	std::thread m_receiveThread;
+	void receive();
 public:
 	StreamReceiver(const char* streamUrl, int timeOut, InputPixelFormat& targetPixelFormat, FrameReceived frameReceived);
 	~StreamReceiver();
 	StatusCode init(bool enableHardwareDecode = false);
-	void receive();
+	void keep_receive();
 };
 

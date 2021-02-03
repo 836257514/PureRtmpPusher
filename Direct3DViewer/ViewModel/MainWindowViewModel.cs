@@ -36,19 +36,20 @@ namespace Direct3DViewer.ViewModel
             _instance = IntPtr.Zero;
         }
 
-        private void StartReceive(object e)
+        private async void StartReceive(object e)
         {
             if (_instance == IntPtr.Zero)
             {
                 _instance = SDK.CreateInstance("rtmp://192.168.6.98:1935/hls/stream", 3000000, InputPixelFormat.NV12, _received);
-                Task.Run(() =>
+                var statusCode = await Task.Run(() =>
                 {
-                    StatusCode statusCode = SDK.InitInstance(_instance, EnableHardwareDecode);
-                    if (statusCode == StatusCode.Success)
-                    {
-                        SDK.Receive(_instance);
-                    }
+                    return SDK.InitInstance(_instance, EnableHardwareDecode);
                 });
+
+                if (statusCode == StatusCode.Success)
+                {
+                    SDK.KeepReceive(_instance);
+                }
             }
         }
 

@@ -20,6 +20,6 @@ namespace Direct3DViewer
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             imgHoster.Source = _imageSource.ImageSource;
-        }    
+        }
     }
 }
