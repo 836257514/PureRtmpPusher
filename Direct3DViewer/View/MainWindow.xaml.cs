@@ -1,7 +1,7 @@
 ﻿using Direct3DViewer.ViewModel;
 using System.Windows;
 
-namespace Direct3DViewer
+namespace Direct3DViewer.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

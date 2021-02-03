@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Direct3DViewer.Interface;
+using Direct3DViewer.Utility;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Direct3DViewer.SDKWrapper

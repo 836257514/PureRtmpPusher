@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Direct3DViewer
+namespace Direct3DViewer.Utility
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT
@@ -11,7 +11,8 @@ namespace Direct3DViewer
         public int Right;                           //最右坐标
         public int Bottom;                        //最下坐标
     }
-  public  class Interop
+
+    public  class Interop
     {
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]

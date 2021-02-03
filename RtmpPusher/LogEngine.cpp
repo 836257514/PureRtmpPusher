@@ -6,26 +6,26 @@
 #pragma warning(disable: 4996)
 using namespace std;
 
-LogEngine* LogEngine::m_instance = NULL; //定义及初始化
+LogEngine* LogEngine::m_instance = nullptr; //定义及初始化
 
 LogEngine::LogEngine()
 {
-	m_file = NULL;
+	m_file = nullptr;
 	memset(m_currentLogFileName, 0x00, 50);
 }
 
 LogEngine::~LogEngine()
 {
-	if (m_file != NULL)
+	if (m_file != nullptr)
 	{
 		fclose(m_file);
-		m_file = NULL;
+		m_file = nullptr;
 	}
 }
 
 LogEngine* LogEngine::get_instance()
 {
-	if (NULL != m_instance)
+	if (nullptr != m_instance)
 	{
 		return m_instance;
 	}
@@ -53,8 +53,9 @@ bool LogEngine::init_logger(const char* directory)
 		strftime(localTime, 50, "%Y_%m_%d_%H_%M", localtime(&t));
 		sprintf(m_currentLogFileName, "%s/%s.txt", directory, localTime);
 		m_file = fopen(m_currentLogFileName, "w+");
-		return m_file != NULL;
 	}
+
+	return m_file != nullptr;
 }
 
 void LogEngine::get_local_time()

@@ -15,9 +15,7 @@ namespace Direct3DViewer
     public class D3DImageSource : IRenderSource
     {
         private static Format D3DFormatYU12 = (Format)0x30323449;
-
         private static Format D3DFormatYV12 = D3DX.MakeFourCC((byte)'Y', (byte)'V', (byte)'1', (byte)'2');
-        //private static Format D3DFormatYU12 = D3DX.MakeFourCC((byte)'Y', (byte)'U', (byte)'1', (byte)'2');
         private static Format D3DFormatNV12 = D3DX.MakeFourCC((byte)'N', (byte)'V', (byte)'1', (byte)'2');
         private static RawColorBGRA BlackColor = new RawColorBGRA(0, 0, 0, 0xFF);
 

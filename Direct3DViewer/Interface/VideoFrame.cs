@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Direct3DViewer
+namespace Direct3DViewer.Interface
 {
     [StructLayout(LayoutKind.Sequential), Serializable]
     public struct VideoFrame

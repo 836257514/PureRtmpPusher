@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Direct3DViewer
+namespace Direct3DViewer.Interface
 {
 	public enum FrameFormat
 	{

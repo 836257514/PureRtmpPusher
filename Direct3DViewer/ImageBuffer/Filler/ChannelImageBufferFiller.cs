@@ -1,4 +1,5 @@
-﻿using SharpDX;
+﻿using Direct3DViewer.Utility;
+using SharpDX;
 using System;
 
 namespace Direct3DViewer.ImageBuffer.Filler
