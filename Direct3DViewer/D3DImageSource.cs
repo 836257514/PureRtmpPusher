@@ -38,14 +38,6 @@ namespace Direct3DViewer
 
         public ImageSource ImageSource => _d3dImage;
 
-        public bool IsDeviceAvailable
-        {
-            get
-            {
-                return CheckDevice();
-            }
-        }
-
         public bool IsDeviceCreated => _device != null;
 
         public event EventHandler ImageSourceChanged;
@@ -55,7 +47,7 @@ namespace Direct3DViewer
         public D3DImageSource(int adapterId)
         {
             _d3dImage = new D3DImage();
-            _d3dImage.IsFrontBufferAvailableChanged += OnIsFrontBufferAvailableChanged;
+            _d3dImage.IsFrontBufferAvailableChanged += RefreshImageBuffer;
             InitD3D(adapterId);
             var form = new Form();
             _hwnd = form.Handle;
@@ -108,7 +100,9 @@ namespace Direct3DViewer
         public void Render(IntPtr yBuffer, IntPtr uBuffer, IntPtr vBuffer)
         {
             FillBuffer(yBuffer, uBuffer, vBuffer);
-            StretchSurface();
+            //Copy the contents of the source rectangle to the destination rectangle
+            //The source rectangle can be stretched and filtered by the copy. This function is often used to change the aspect ratio of a video stream.
+            _device.StretchRectangle(_offScreenSurface, _renderSurface, TextureFilter.Linear);
             if (!_d3dImage.Dispatcher.CheckAccess())
             {
                 _d3dImage.Dispatcher.Invoke(() => InvalidateImage());
@@ -126,6 +120,7 @@ namespace Direct3DViewer
             _displayMode = _context.GetAdapterDisplayMode(adapterId);
             Capabilities deviceCap = _context.GetDeviceCaps(_adapterId, DeviceType.Hardware);
             createFlag = CreateFlags.Multithreaded;
+            //设备的硬件顶点处理能力
             if (deviceCap.VertexProcessingCaps != 0)
             {
                 createFlag |= CreateFlags.HardwareVertexProcessing;
@@ -222,20 +217,7 @@ namespace Direct3DViewer
             _offScreenSurface.UnlockRectangle();
         }
 
-        private void StretchSurface()
-        {
-            //_device.ColorFill(_renderSurface, BlackColor);
-
-            _device.StretchRectangle(_offScreenSurface, _renderSurface, TextureFilter.Linear);
-        }
-
-        private bool CheckDevice()
-        {
-            DeviceState state = _device.CheckDeviceState(_hwnd);
-            return state == DeviceState.Ok;
-        }
-
-        private void OnIsFrontBufferAvailableChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void RefreshImageBuffer(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (_d3dImage.IsFrontBufferAvailable && _renderSurface != null)
             {
@@ -252,9 +234,8 @@ namespace Direct3DViewer
                 _d3dImage.Dispatcher.Invoke(() => SetImageSourceBackBuffer());
                 return;
             }
-            _d3dImage.Lock();
-            _d3dImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, _renderSurface.NativePointer);
-            _d3dImage.Unlock();
+
+            RefreshImageBuffer(this, new DependencyPropertyChangedEventArgs());
             _imageRect = new Int32Rect(0, 0, _d3dImage.PixelWidth, _d3dImage.PixelHeight);
         }
 
