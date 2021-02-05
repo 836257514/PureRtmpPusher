@@ -8,7 +8,7 @@
 #include "Pusher.h"
 #include "PushConfigCommon.h"
 #include "Logger.h"
-
+#include "DirectShowCameraCapture.h"
 extern "C"
 {
 #include "libavutil/log.h"
@@ -17,38 +17,59 @@ extern "C"
 void log_output(void* ptr, int level, const char* fmt, va_list vl);
 PushConfig get_push_config();
 VideoConfig get_video_config(PushConfig& pushConfig, std::string& deviceName);
-
 int main()
 {
 	Logger::init("C:\\RTMPLog");
-	av_log_set_callback(log_output); 
-	cout << "input device name:" << endl;
-	std::string deviceName;
-	getline(cin, deviceName);
-	PushConfig pushConfig = get_push_config();
-	VideoConfig videoConfig = get_video_config(pushConfig, deviceName);
+	av_log_set_callback(log_output);
 
-	Pusher* pusher = new Pusher();
-	pusher->set_config(pushConfig);
-	auto encodedCallBack = std::bind(&Pusher::push, pusher, std::placeholders::_1);
-	Encoder* encoder = new Encoder(pushConfig, encodedCallBack, true);
-	AVPixelFormat format = encoder->get_input_image_format();
-
-	auto imageCapturedCallBack = std::bind(&Encoder::encode_frame,
-		encoder, std::placeholders::_1);
-	ImageCapturer* capture = new ImageCapturer(imageCapturedCallBack, format);
-
-	bool readyToUse = capture->open_camera(videoConfig);
-	if (readyToUse)
+	DirectShowCameraCapture dShowCapture;
+	map<int, string> map;
+	dShowCapture.get_camera_list(map);
+	
+	if (map.size() == 0)
 	{
-		std::thread t1(&ImageCapturer::read, capture);
-		t1.join();
+		cout << "Sorry, can'not find any camera on pc." << endl;
+		system("Pause");
+		return 0;
 	}
 
-	delete pusher;
-	delete encoder;
-	delete capture;
-	Logger::write("APP is paused.");
+	cout << "The camera list is below, please choose one:" << endl;
+	for (std::map<int, string>::iterator it = map.begin(); it != map.end(); ++it)
+	{
+		std::map<int, string>::value_type item = (*it);
+		cout << item.first << "." << item.second << endl;
+	}
+
+	int key;
+	cin >> key;
+	if (map.count(key) == 1)
+	{
+		PushConfig pushConfig = get_push_config();
+		VideoConfig videoConfig = get_video_config(pushConfig, map[key]);
+
+		Pusher* pusher = new Pusher();
+		pusher->set_config(pushConfig);
+		auto encodedCallBack = std::bind(&Pusher::push, pusher, std::placeholders::_1);
+		Encoder* encoder = new Encoder(pushConfig, encodedCallBack, true);
+		AVPixelFormat format = encoder->get_input_image_format();
+
+		auto imageCapturedCallBack = std::bind(&Encoder::encode_frame,
+			encoder, std::placeholders::_1);
+		ImageCapturer* capture = new ImageCapturer(imageCapturedCallBack, format);
+
+		bool readyToUse = capture->open_camera(videoConfig);
+		if (readyToUse)
+		{
+			std::thread t1(&ImageCapturer::read, capture);
+			t1.join();
+		}
+
+		delete pusher;
+		delete encoder;
+		delete capture;
+		Logger::write("APP is paused.");	
+	}
+
 	system("pause");
 }
 
