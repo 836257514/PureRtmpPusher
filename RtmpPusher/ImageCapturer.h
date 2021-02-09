@@ -16,9 +16,6 @@ extern "C"
 #include "Logger.h"
 using namespace std;
 
-//just shorthand to avoid long typing
-typedef std::function<void(AVFrame * frame)> ImageCallBack;
-
 class ImageCapturer
 {
 private:

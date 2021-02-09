@@ -1,7 +1,9 @@
 #pragma once
-#include "ImageCapturer.h"
+#include "CameraData.h"
 #include <functional>
 #include "PushConfigCommon.h"
+#include "Logger.h"
+#include "ImgUtility.h"
 #define  LIVESTREAM_BITRATE_720P 800000
 extern "C"
 {

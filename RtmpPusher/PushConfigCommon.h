@@ -7,4 +7,6 @@ struct PushConfig
 	int width;
 	int height;
 	int frameRate;
+
+	PushConfig(std::string u, int w, int h, int f):url(u), width(w), height(h), frameRate(f) {}
 };

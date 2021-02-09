@@ -15,17 +15,15 @@ extern "C"
 }
 
 void log_output(void* ptr, int level, const char* fmt, va_list vl);
-PushConfig get_push_config();
-VideoConfig get_video_config(PushConfig& pushConfig, std::string& deviceName);
+
 int main()
 {
 	Logger::init("C:\\RTMPLog");
 	av_log_set_callback(log_output);
 
-	DirectShowCameraCapture dShowCapture;
-	map<int, string> map;
+	DirectShowCameraCapture dShowCapture(MEDIASUBTYPE_RGB24);
+	map<int, DeviceInfo> map;
 	dShowCapture.get_camera_list(map);
-	
 	if (map.size() == 0)
 	{
 		cout << "Sorry, can'not find any camera on pc." << endl;
@@ -34,78 +32,41 @@ int main()
 	}
 
 	cout << "The camera list is below, please choose one:" << endl;
-	for (std::map<int, string>::iterator it = map.begin(); it != map.end(); ++it)
+	for (std::map<int, DeviceInfo>::iterator it = map.begin(); it != map.end(); ++it)
 	{
-		std::map<int, string>::value_type item = (*it);
-		cout << item.first << "." << item.second << endl;
+		std::map<int, DeviceInfo>::value_type item = (*it);
+		cout << item.first << "." << item.second.friendlyName << endl;
 	}
 
 	int key;
 	cin >> key;
 	if (map.count(key) == 1)
 	{
-		PushConfig pushConfig = get_push_config();
-		VideoConfig videoConfig = get_video_config(pushConfig, map[key]);
-
+		DeviceInfo item = map[key];
+		item.output();
+		int configIndex;
+		cin >> configIndex;
+		item.set_config(configIndex);
+		int height = item.selectedConfig.height;
+		int width = item.selectedConfig.width;
+		int frameRate = item.selectedConfig.frameRate;
+		PushConfig pushConfig("rtmp://192.168.6.98:1935/hls/stream", width, height, frameRate);
 		Pusher* pusher = new Pusher();
 		pusher->set_config(pushConfig);
 		auto encodedCallBack = std::bind(&Pusher::push, pusher, std::placeholders::_1);
 		Encoder* encoder = new Encoder(pushConfig, encodedCallBack, true);
 		AVPixelFormat format = encoder->get_input_image_format();
-
-		auto imageCapturedCallBack = std::bind(&Encoder::encode_frame,
+		ImageCallBack imageCapturedCallBack = std::bind(&Encoder::encode_frame,
 			encoder, std::placeholders::_1);
-		ImageCapturer* capture = new ImageCapturer(imageCapturedCallBack, format);
+		CaptureData captureData(width, height, AV_PIX_FMT_NV12);
+		dShowCapture.set_encode_callBack(imageCapturedCallBack, captureData);
+		dShowCapture.capture(item);
 
-		bool readyToUse = capture->open_camera(videoConfig);
-		if (readyToUse)
-		{
-			std::thread t1(&ImageCapturer::read, capture);
-			t1.join();
-		}
-
+		system("pause");
 		delete pusher;
 		delete encoder;
-		delete capture;
 		Logger::write("APP is paused.");	
 	}
-
-	system("pause");
-}
-
-PushConfig get_push_config()
-{
-	PushConfig pushConfig = { "rtmp://192.168.6.98:1935/hls/stream", 1280, 720, 30 };
-	cout << "press 1 to push 1080P 30fps, press 2 to push 720p 30fps, press 3 to push 480p 30fps:" << endl;
-	int choose = 0;
-	cin >> choose;
-	if (choose == 1)
-	{
-		pushConfig.width = 1920;
-		pushConfig.height = 1080;
-	}
-
-	if (choose == 3)
-	{
-		pushConfig.width = 640;
-		pushConfig.height = 480;
-	}
-
-	return pushConfig;
-}
-
-VideoConfig get_video_config(PushConfig& pushConfig, std::string& deviceName)
-{
-	VideoConfig config;
-	std::string inputUrl = "video=" + deviceName;
-	unsigned int length = inputUrl.length() + 1;
-	config.inputUrl = new char[length]();
-	strcpy_s(config.inputUrl, length, inputUrl.c_str());
-	cout << "the input device name is :" << config.inputUrl << endl;
-	config.map["video_size"] = std::to_string(pushConfig.width) + "x" + std::to_string(pushConfig.height);
-	config.map["framerate"] = std::to_string(pushConfig.frameRate);
-	config.map["vcodec"] = "mjpeg";
-	return config;
 }
 
 void log_output(void* ptr, int level, const char* fmt, va_list vl) 

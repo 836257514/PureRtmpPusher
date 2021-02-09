@@ -97,10 +97,12 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Pusher.cpp" />
     <ClCompile Include="RtmpPusher.cpp" />
+    <ClCompile Include="SampleGrabberCallback.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraData.h" />
     <ClInclude Include="CImg.h" />
+    <ClInclude Include="DeviceInfo.h" />
     <ClInclude Include="DirectShowCameraCapture.h" />
     <ClInclude Include="Encoder.h" />
     <ClInclude Include="ImageCapturer.h" />
@@ -109,6 +111,8 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="PushConfigCommon.h" />
     <ClInclude Include="Pusher.h" />
+    <ClInclude Include="qedit.h" />
+    <ClInclude Include="SampleGrabberCallback.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
