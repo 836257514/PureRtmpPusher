@@ -2,6 +2,7 @@
 extern "C"
 {
 #include <libavutil\frame.h>
+#include <libavdevice/avdevice.h>
 }
 
 #include "CImg.h"

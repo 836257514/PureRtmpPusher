@@ -11,10 +11,25 @@ extern "C"
 #include "Encoder.h"
 #include <functional>
 #include <string>
-#include "CameraData.h"
 #include "ImgUtility.h"
 #include "Logger.h"
+#include <map>
+#include "SampleGrabberCallback.h"
 using namespace std;
+
+struct VideoConfig
+{
+	char* inputUrl;
+	map<string, string> map;
+};
+
+struct CameraData
+{
+	int width;
+	int height;
+	int videoStreamIndex;
+	AVPixelFormat pixelFormat;
+};
 
 class ImageCapturer
 {

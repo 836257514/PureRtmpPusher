@@ -100,7 +100,6 @@
     <ClCompile Include="SampleGrabberCallback.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CameraData.h" />
     <ClInclude Include="CImg.h" />
     <ClInclude Include="DeviceInfo.h" />
     <ClInclude Include="DirectShowCameraCapture.h" />

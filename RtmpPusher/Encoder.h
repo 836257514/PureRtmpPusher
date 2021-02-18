@@ -1,5 +1,4 @@
 #pragma once
-#include "CameraData.h"
 #include <functional>
 #include "PushConfigCommon.h"
 #include "Logger.h"
@@ -9,6 +8,7 @@ extern "C"
 {
 #include <libavformat\avformat.h>
 #include <libavutil\opt.h>
+#include <libavdevice/avdevice.h>
 }
 
 typedef std::function<void(AVPacket * avPacket)> H264EncodedCallBack;

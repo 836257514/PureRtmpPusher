@@ -13,12 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Deprecation">
+      <UniqueIdentifier>{8347632f-82ad-460a-b3c1-8e76e907fe96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RtmpPusher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImageCapturer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Pusher.cpp">
@@ -39,14 +39,11 @@
     <ClCompile Include="SampleGrabberCallback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImageCapturer.cpp">
+      <Filter>Deprecation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImageCapturer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CameraData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CImg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -79,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="SampleGrabberCallback.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageCapturer.h">
+      <Filter>Deprecation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

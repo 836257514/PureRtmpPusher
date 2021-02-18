@@ -1,12 +1,11 @@
 #include "DirectShowCameraCapture.h"
 
-DirectShowCameraCapture::DirectShowCameraCapture(GUID outputFormat) :
+DirectShowCameraCapture::DirectShowCameraCapture() :
 	m_pEnumMoniker(nullptr),
 	m_pFrameGrabberFilter(nullptr),
 	m_pGraph(nullptr),
 	m_pCaptureGraphBuilder2(nullptr)
 {
-	m_outputFormat = outputFormat;
 	HRESULT hr = CoInitialize(nullptr);
 	if (FAILED(hr)) {
 		Logger::write("Can not init COM.");
@@ -29,6 +28,7 @@ DirectShowCameraCapture::DirectShowCameraCapture(GUID outputFormat) :
 	{
 		Logger::write("Create filter graph failed");
 	}
+
 	hr = CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC, IID_ICaptureGraphBuilder2, (void**)&m_pCaptureGraphBuilder2);
 	if (FAILED(hr))
 	{
@@ -152,8 +152,8 @@ HRESULT DirectShowCameraCapture::capture(DeviceInfo& deviceInfo)
 	HRESULT hr = E_FAIL;
 	ISampleGrabber* gGrabber;
 	hr = m_pFrameGrabberFilter->QueryInterface(IID_ISampleGrabber, (void**)&gGrabber);
-	AM_MEDIA_TYPE mediaType(*deviceInfo.selectedConfig.pMediaType);
-	mediaType.subtype = m_outputFormat;
+	AM_MEDIA_TYPE mediaType(*(deviceInfo.selectedConfig.pMediaType));
+	mediaType.subtype = directshow_format_convert(deviceInfo.selectedConfig.pMediaType->subtype);
 	gGrabber->SetMediaType(&mediaType);
 	m_pGraph->AddFilter(deviceInfo.pDeviceFilter, L"Device Filter");
 	hr = m_pCaptureGraphBuilder2->RenderStream(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, deviceInfo.pDeviceFilter, NULL, m_pFrameGrabberFilter);
@@ -162,7 +162,17 @@ HRESULT DirectShowCameraCapture::capture(DeviceInfo& deviceInfo)
 	return hr;
 }
 
-void DirectShowCameraCapture::set_encode_callBack(ImageCallBack& imageCaptureCB, CaptureData& cameraData)
+GUID DirectShowCameraCapture::directshow_format_convert(GUID subtype)
+{
+	if (subtype == MEDIASUBTYPE_MJPG)
+	{
+		return MEDIASUBTYPE_RGB24;
+	}
+
+	return subtype;
+}
+
+void DirectShowCameraCapture::set_encode_callBack(ImageCallBack& imageCaptureCB, CaptureInfo& cameraData)
 {
 	m_sampleGrabberCallBack.SetCallback(imageCaptureCB, cameraData);
 }

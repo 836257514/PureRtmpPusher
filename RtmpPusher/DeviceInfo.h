@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 struct DeviceConfig
 {
@@ -11,6 +12,12 @@ struct DeviceConfig
 	DeviceConfig() {}
 };
 
+enum class CaptureFormat
+{
+	MJpeg,
+	YUY2
+};
+
 struct DeviceInfo
 {
 	std::string deviceId;
@@ -20,7 +27,7 @@ struct DeviceInfo
 	std::vector<DeviceConfig> configs;
 	DeviceConfig selectedConfig;
 
-	DeviceInfo(std::string deviceId, std::string friendlyName) : deviceId(deviceId), friendlyName(friendlyName) {}
+	DeviceInfo(std::string deviceId, std::string friendlyName) : deviceId(deviceId), friendlyName(friendlyName), pDeviceFilter(nullptr), pStreamConfig(nullptr) {}
 	DeviceInfo() {}
 
 	void refresh(IMoniker* pMoniker, ICaptureGraphBuilder2* pCaptureGraphBuilder2)
@@ -87,10 +94,26 @@ struct DeviceInfo
 		}
 	}
 
-	void set_config(int index)
+	CaptureFormat set_config(int index)
 	{
-		selectedConfig = configs[index];
-		pStreamConfig->SetFormat(selectedConfig.pMediaType);
+		if (configs.size() - 1 >= index)
+		{
+			selectedConfig = configs[index];
+			pStreamConfig->SetFormat(selectedConfig.pMediaType);
+			if (selectedConfig.pMediaType->subtype == MEDIASUBTYPE_MJPG)
+			{
+				return CaptureFormat::MJpeg;
+			}
+
+			if (selectedConfig.pMediaType->subtype == MEDIASUBTYPE_YUY2)
+			{
+				return CaptureFormat::YUY2;
+			}
+		}
+		else
+		{
+			std::cout << "invalid config index";
+		}
 	}
 };
 

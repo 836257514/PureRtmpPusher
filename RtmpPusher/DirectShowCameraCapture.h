@@ -7,8 +7,6 @@
 #include "DeviceInfo.h"
 #include "qedit.h"
 #include "SampleGrabberCallback.h"
-#include "PushConfigCommon.h"
-#include "ImageCapturer.h"
 
 using namespace std;
 
@@ -21,13 +19,14 @@ private:
     IBaseFilter* m_pFrameGrabberFilter;
     IGraphBuilder* m_pGraph; // graph manager
     ICaptureGraphBuilder2* m_pCaptureGraphBuilder2;
-    GUID m_outputFormat;
 public:
-    DirectShowCameraCapture(GUID outputFormat);
+    DirectShowCameraCapture();
     ~DirectShowCameraCapture();
 public:
     HRESULT get_camera_list(map<int, DeviceInfo>&);
     HRESULT capture(DeviceInfo&);
-    void set_encode_callBack(ImageCallBack& imageCaptureCB, CaptureData& cameraData);
+    void set_encode_callBack(ImageCallBack& imageCaptureCB, CaptureInfo& cameraData);
+private:
+    GUID directshow_format_convert(GUID);
 };
 

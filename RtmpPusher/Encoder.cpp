@@ -13,7 +13,7 @@ Encoder::Encoder(PushConfig& config, H264EncodedCallBack callBack, bool enableHa
 		m_avCodecContext = get_hardware_codec(config.width, config.height, config.frameRate);
 		if (m_avCodecContext == NULL)
 		{
-			throw exception("Cann't find qsv encoder");
+			throw std::exception("Cann't find qsv encoder");
 		}
 	}
 	else

@@ -2,7 +2,6 @@
 //
 #include <cstring>
 #include <iostream>
-#include "ImageCapturer.h"
 #include "Encoder.h"
 #include <thread>
 #include "Pusher.h"
@@ -21,7 +20,7 @@ int main()
 	Logger::init("C:\\RTMPLog");
 	av_log_set_callback(log_output);
 
-	DirectShowCameraCapture dShowCapture(MEDIASUBTYPE_RGB24);
+	DirectShowCameraCapture dShowCapture;
 	map<int, DeviceInfo> map;
 	dShowCapture.get_camera_list(map);
 	if (map.size() == 0)
@@ -46,7 +45,7 @@ int main()
 		item.output();
 		int configIndex;
 		cin >> configIndex;
-		item.set_config(configIndex);
+		CaptureFormat srcFormat = item.set_config(configIndex);
 		int height = item.selectedConfig.height;
 		int width = item.selectedConfig.width;
 		int frameRate = item.selectedConfig.frameRate;
@@ -56,9 +55,8 @@ int main()
 		auto encodedCallBack = std::bind(&Pusher::push, pusher, std::placeholders::_1);
 		Encoder* encoder = new Encoder(pushConfig, encodedCallBack, true);
 		AVPixelFormat format = encoder->get_input_image_format();
-		ImageCallBack imageCapturedCallBack = std::bind(&Encoder::encode_frame,
-			encoder, std::placeholders::_1);
-		CaptureData captureData(width, height, AV_PIX_FMT_NV12);
+		ImageCallBack imageCapturedCallBack = std::bind(&Encoder::encode_frame, encoder, std::placeholders::_1);
+		CaptureInfo captureData(width, height, srcFormat, AV_PIX_FMT_NV12);
 		dShowCapture.set_encode_callBack(imageCapturedCallBack, captureData);
 		dShowCapture.capture(item);
 
