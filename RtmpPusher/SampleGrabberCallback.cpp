@@ -20,7 +20,16 @@ HRESULT SampleGrabberCallback::SampleCB(double sampleTime, IMediaSample* pSample
 
 HRESULT SampleGrabberCallback::BufferCB(double sampleTime, unsigned char* pBuffer, long bufferLength) {
     if (pBuffer) {
-		memcpy_s(m_avFramePair.srcAVFrame->data[0], bufferLength, pBuffer, bufferLength);
+
+		//Flip
+		int stride = m_avFramePair.srcAVFrame->linesize[0];
+		pBuffer += stride * (m_avFramePair.srcAVFrame->height - 1);
+		for (int i = 0; i < m_avFramePair.srcAVFrame->height; ++i)
+		{
+			memcpy_s(m_avFramePair.srcAVFrame->data[0] + i * stride, bufferLength, pBuffer, stride);
+			pBuffer -= stride;
+		}
+		
 		int ret = sws_scale(m_swsContext, m_avFramePair.srcAVFrame->data, m_avFramePair.srcAVFrame->linesize, 0, m_avFramePair.srcAVFrame->height,
 			m_avFramePair.outputYuvFrame->data, m_avFramePair.outputYuvFrame->linesize);
 		if (ret <= 0)
@@ -47,10 +56,10 @@ void SampleGrabberCallback::SetCallback(ImageCallBack& imageCaptureCB, CaptureIn
 
 	m_avFramePair.srcAVFrame->width = captureData.width;
 	m_avFramePair.srcAVFrame->height = captureData.height;
-	AVPixelFormat inputFormat;
+	AVPixelFormat inputFormat = AV_PIX_FMT_BGR24;
 	if (captureData.inputFormat == CaptureFormat::MJpeg)
 	{
-		inputFormat = AV_PIX_FMT_RGB24;
+		inputFormat = AV_PIX_FMT_BGR24;
 		m_avFramePair.srcAVFrame->linesize[0] = captureData.width * 3;
 	}
 
